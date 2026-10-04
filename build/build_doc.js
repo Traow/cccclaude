@@ -189,7 +189,8 @@ children.push(
       ["SWOT", "Ülevaade sise- ja väliskeskkonnast", "Ei näita põhjuslikke seoseid", "Keskkonna analüüs alapeatükis 1.3"],
     ]),
   source(`Allikas: European Commission, 2004; Ishikawa, 1990; Ohno, 1988; Learn Lean Sigma, s.a.; LinkedIn, s.a. Vastutaja: ${PJ}.`),
-  P(`**Tehisaru ja teaduslike lisaallikate kasutamine.** Rühm kasutas suurt keelemudelit Claude (Anthropic, 2026) töö struktuuri ja analüüsi kavandi koostamiseks, allikate leidmiseks ning valmis versioonile kriitilise tagasiside saamiseks; päringud koostas ja väljundi kvaliteeti kontrollis ${AI}. Tehisaru pakutud väited ja viited kontrolliti algallikatest; huvi- ja mõjuhinnangud ning alternatiivide hinded on rühma ekspertarvamus. Vestlused tehisaruga toimusid 4. oktoobril 2026; vestlus ja selle põhjal tehtud täiendused on esitatud lisas 3. Spordiklubi brändi ja fännide samastumise mõistmiseks kasutati teaduskirjandust brändiväärtusest (Keller, 1993) ja spordifännide samastumisest klubiga (Wann & Branscombe, 1993).`),
+  P(`**Tehisaru kasutamine.** Töö koostamisel kasutati 4. oktoobril 2026 keelemudelit Claude (Anthropic, 2026): allikate otsimiseks, töö struktuuri ja tekstikavandi, jooniste ja tabelite koostamiseks ning tagasiside saamiseks. Rühm andis projekti lähteandmed (meeskond, huvipooled, eelarve, ajakava), päringud koostas ja väljundi vaatas üle ${AI}. Huvi- ja mõjuhinnangud ning alternatiivide hinded on esialgsed ja rühm valideerib need. Rühm vastutab töö sisu eest; vestluse kokkuvõte on lisas 3.`),
+  P("Spordiklubi brändi ja fännide samastumise mõistmiseks kasutati teaduskirjandust brändiväärtusest (Keller, 1993) ja spordifännide samastumisest klubiga (Wann & Branscombe, 1993)."),
 );
 
 // 1.2.2 PROBLEEMIPUU
@@ -437,22 +438,18 @@ children.push(
   P("**Milliseid oskusi arendasime?** Probleemi eristamist riskist, põhjuslike seoste modelleerimist, eesmärkide sõnastamist püsiseisunditena (mitte „uus logo“), huvipoolte hindamist ja vastandlike huvide ühitamist, kaalutud otsustusanalüüsi koos tundlikkusanalüüsiga, Wordi jooniste ala ja pealdiste kasutamist ning tehisaru väljundi kriitilist hindamist."),
   P("**Mis toetas ja mis takistas õppimist?** Toetasid slaidikogu näited (slaid 17, 29 ja 33), rühmaliikmete rollijaotus (omanik, ekspert, projektijuht, kvaliteedikontroll) ning tehisaru kiire tagasiside. Takistasid see, et fännibaasi killustumise kohta puuduvad avalikud kvantitatiivsed andmed (need tuleb koguda turu-uuringuga), ning see, et huvi- ja mõjuhinnangud on subjektiivsed, kuni neid pole huvipooltega valideeritud."),
   P("**Kas alternatiivsed ideed täidavad kaardistatud eesmärke erinevalt?** Jah. Tabelist 5 nähtub, et vana vapi taastamine (A) ja kahetasandiline bränd (B) katavad sümboolika haru, logo ümberkujundamine koos fännidega (C) ja kommunikatsiooniprogramm (D) kaasamise ja kommunikatsiooni haru. Ükski alternatiiv üksi ei kata kõiki alameesmärke, seetõttu on parim lahendus kombinatsioon B+D."),
-  P("**Millist tagasisidet saime tehisarult ja kas täiendasime tööd?** Tehisaru tagasiside ja selle põhjal tehtud muudatused on esitatud lisas 3."),
+  P("**Millist tagasisidet saime tehisarult ja kas täiendasime tööd?** Tehisaru tagasiside ja avatud küsimused on kokku võetud lisas 3."),
   P("**Kuidas tagasime rühmas usalduse ja vastutuse?** Usalduse ja vastutuse tagame teadmisega, et meil kõigil on ühine eesmärk – omandada kõrgharidus. Lisaks on igal objektil nimeline vastutaja ja kaasteostaja (lisa 1), kes kontrollib vastutaja tööd enne vahetähtaega. Kõik versioonid ja tehisaruga peetud vestlused on Google Workspace’is kõigile nähtavad ning kiired küsimused lahendatakse Messengeri grupis, mis loob läbipaistvuse ja võimaldab iga liikme panust hinnata."),
 
-  LISA("Lisa 3. Vestlus tehisaruga ja selle põhjal tehtud täiendused"),
-  P(`Tehisaruna kasutati keelemudelit Claude (Anthropic, 2026); päringud koostas ${AI}. Allpool on vestluse sisu lühendatult; täielik vestlus on rühma Google Workspace’i kaustas kõigile liikmetele nähtav.`),
-  P("**Päring 1 (lühendatult):** „Vaadake üle slaidikogu 2 slaidid 1–36 ning muud seonduvad juhendid. Esitage terviklikku peatükkide struktuuri sisaldav DOCX-fail, milles on alapeatükk 1.2: metoodika, probleemide puu, eesmärkide puu, huvigruppide tabel ja kaasamise strateegia, alternatiivide võrdlus; lisad tööjaotuse ja õppetundidega.“"),
-  P("**Päring 2 (lühendatult):** „Meie projekt on Juventus FC rebrändimine „Juventus uuesti ja paremini“. 2017. aasta rebränding põhjustas fännibaasi killustumise. Meeskond: Herman Ra Truvek (projektijuht), Robi Mustsaar (AI prompter/kvaliteedikontroll), Hugo-Christopher Saar (ekspert), Ragnar Dietrich (omanik). Huvipooled, kaheksa spetsialistirolli, eelarve ca 96 800 € (7 kulukategooriat, ca 9000 € reserv), teostusfaas 3 kuud.“"),
-  P("**Tehisaru tagasiside ja rühma tegevus:**"),
-  N("Probleemipuusse ei tohi panna projekti riske (nt „fännid võivad ka uut lahendust kritiseerida“) – need kuuluvad alapeatükki 1.3. *Arvestatud.*", "num2"),
-  N("„Uus logo“ on projekti tulem, mitte eesmärk; eesmärk on fännide samastumine klubiga. *Arvestatud: eesmärgipuus on seisundid ja mõõdetavad näitajad.*", "num2"),
-  N("96 800 eurot ja 3 kuud on täieliku globaalse rebrändingu jaoks vähe (2017. aasta identiteedi lõi rahvusvaheline agentuur Interbrand). Seetõttu on eelistatud alternatiivid, mis kasutavad olemasolevat „J“-kaubamärki. *Arvestatud: kriteeriumid K3 ja K4.*", "num2"),
-  N(`Eelarve jaotus kategooriate kaupa (tabel 7) on tehisaru pakutud näidisjaotus, mis vastab antud kogusummale ja reservile. *Avatud: kinnitavad ${OM} ja ${PJ}.*`, "num2"),
-  N(`Rühma viidatud lisamaterjali link 2017. aasta rebrändingu kohta ei jõudnud tehisaruni; kasutati Dezeeni, Football Italia, Design Weeki ja It’s Nice That’i artikleid. *Avatud: ${AI} lisab rühma allika viidetesse.*`, "num2"),
-  N(`Torino härg on linna sümbol, mistõttu tuleb selle kasutusõigus pärandvapis kontrollida. *Avatud: ${EX} koos kaubamärgiõiguse spetsialistiga.*`, "num2"),
-  N(`Tehisaru ei pääsenud ligi LinkedIni artiklile ega kolledži blanketile. *Avatud: ${PJ} loeb artikli läbi, ${AI} tõstab töö blanketti.*`, "num2"),
-  P("**Rühma hinnang tehisaru kasutamisele:** tehisaru kiirendas struktuuri loomist ja aitas leida nõrku kohti, kuid sisulised hinnangud, projekti kontekst ja allikate kontroll jäid rühma vastutusele."),
+  LISA("Lisa 3. Vestlus tehisaruga"),
+  P(`Tehisaruna kasutati keelemudelit Claude (Anthropic, 2026), päringud koostas ${AI}. Täielik vestlus on rühma Google Workspace’i kaustas kõigile liikmetele nähtav.`),
+  P("**Päringud (lühendatult):** 1) koostada slaidikogu 2 ja seonduvate juhendite põhjal alapeatükk 1.2 koos tervikliku struktuuri ja lisadega; 2) kohandada töö projektile „Juventus uuesti ja paremini“ rühma antud lähteandmetega (meeskond, huvipooled, spetsialistid, eelarve 96 800 €, teostusfaas 3 kuud); 3) vormistada töö Pärnu kolledži üliõpilastööde juhendi järgi."),
+  P("**Peamine tagasiside ja avatud küsimused:**"),
+  N("„Uus logo“ on projekti tulem, mitte eesmärk – eesmärk on fännide samastumine klubiga.", "num2"),
+  N("96 800 € ja 3 kuud ei piisa täielikuks globaalseks rebrändinguks, seetõttu eelistati olemasolevat „J“-kaubamärki kasutavaid alternatiive.", "num2"),
+  N(`Eelarve jaotus kategooriate kaupa (tabel 7) on näidisjaotus – kinnitavad ${OM} ja ${PJ}.`, "num2"),
+  N(`Torino härja kasutusõigus pärandvapis tuleb kontrollida – ${EX}.`, "num2"),
+  P("Rühma hinnangul kiirendas tehisaru töö ülesehitust ja allikate leidmist; sisu õigsuse ja lõpliku teksti eest vastutab rühm."),
 );
 
 // ---------- dokument ----------
