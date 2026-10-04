@@ -18,7 +18,7 @@
   "interest": 5,
   "influence": 4,
   "dx": 0,
-  "dy": -0.36,
+  "dy": -0.45,
   "wish": "Ühtne globaalne bränd, mõõdetav fännide rahulolu",
   "mode": "Brändi omanik igapäevaselt, eelarve haldus",
   "strategy": "Võtmeisik: juhtkomitee liige, iganädalane staatus"
@@ -30,7 +30,7 @@
   "interest": 2,
   "influence": 3,
   "dx": 0,
-  "dy": 0.36,
+  "dy": 0.45,
   "wish": "Aktsia väärtus, kulude põhjendatus",
   "mode": "Aktsionäride üldkoosolek, investorsuhted",
   "strategy": "Jälgi: investorsuhete teade lansseerimisel"
@@ -42,7 +42,7 @@
   "interest": 3,
   "influence": 2,
   "dx": -0.5,
-  "dy": -0.36,
+  "dy": -0.3,
   "wish": "Särgi sümboolika, fännide toetus staadionil",
   "mode": "Brändisaadikud, kampaania nägu",
   "strategy": "Jälgi: kaasa kampaaniasse saadikutena, informeeri sisekommunikatsiooni kaudu"
@@ -54,7 +54,7 @@
   "interest": 5,
   "influence": 3,
   "dx": 0,
-  "dy": -0.36,
+  "dy": -0.45,
   "wish": "Ajaloolise vapi ja sümboolika taastamine",
   "mode": "Arvamusliidrid, staadionikultuur, avalik kriitika",
   "strategy": "Hoia informeerituna: kaasa disaini testimisse ja fännifoorumisse; eesmärk tõsta võtmeisikuks"
@@ -66,7 +66,7 @@
   "interest": 4,
   "influence": 2,
   "dx": 0.35,
-  "dy": 0.3,
+  "dy": 1.0,
   "wish": "Kaasaegne, äratuntav bränd ja digisisu",
   "mode": "Sotsiaalmeedia, e-pood",
   "strategy": "Hoia informeerituna: veebiküsitlus, digikampaania"
@@ -78,7 +78,7 @@
   "interest": 5,
   "influence": 3,
   "dx": 0,
-  "dy": 0.36,
+  "dy": 0.45,
   "wish": "Klubi ajalugu ja Torino identiteet nähtavaks",
   "mode": "Piletimüük, staadioni atmosfäär",
   "strategy": "Hoia informeerituna: fookusgrupid, staadioniüritus lansseerimisel"
@@ -90,7 +90,7 @@
   "interest": 4,
   "influence": 4,
   "dx": 0.35,
-  "dy": 0.36,
+  "dy": 0.45,
   "wish": "Brändi stabiilsus, positiivne meediapilt, toodete müük",
   "mode": "Lepingud, särgid ja tootmine",
   "strategy": "Võtmeisik: varajane konsultatsioon, tootmisgraafiku kokkulepe"
@@ -102,7 +102,7 @@
   "interest": 2,
   "influence": 2,
   "dx": 0,
-  "dy": 0.36,
+  "dy": 0.6,
   "wish": "Linna sümboolika (härg) korrektne kasutus, linna maine",
   "mode": "Linna sümbolite kasutusluba, linnaruumi üritused",
   "strategy": "Jälgi: konsulteeri härja sümboli kasutuse osas"
@@ -113,8 +113,8 @@
   "short": "Litsentsipartnerid",
   "interest": 4,
   "influence": 3,
-  "dx": 0.3,
-  "dy": 0.8,
+  "dx": 0.45,
+  "dy": 1.2,
   "wish": "Laovarude läbimüük, uue kollektsiooni õigeaegne info",
   "mode": "Merchandise'i tootmine ja müük",
   "strategy": "Hoia informeerituna: tootmiskoordinaatori kaudu ajakava ja üleminek"
@@ -126,7 +126,7 @@
   "interest": 2,
   "influence": 4,
   "dx": 0,
-  "dy": -0.36,
+  "dy": -0.45,
   "wish": "Uudisväärtus, konflikti- ja lugude ainestik",
   "mode": "Avaliku arvamuse kujundamine",
   "strategy": "Hoia rahul: suhtekorraldusplaan, eelinfo ja intervjuud"
@@ -138,7 +138,7 @@
   "interest": 1,
   "influence": 4,
   "dx": 0,
-  "dy": 0.36,
+  "dy": 0.45,
   "wish": "Taotluste vastavus nõuetele",
   "mode": "Kaubamärgi registreerimine (väravavaht)",
   "strategy": "Hoia rahul: kaubamärgiõiguse spetsialist esitab taotluse 1. kuul"
@@ -150,7 +150,7 @@
   "interest": 1,
   "influence": 3,
   "dx": 0,
-  "dy": -0.36,
+  "dy": -0.45,
   "wish": "Vormi ja sümboolika reeglite järgimine",
   "mode": "Mängusärgi ja logo kasutuse nõuded",
   "strategy": "Jälgi: nõuete kontroll enne särgi kujunduse kinnitamist"

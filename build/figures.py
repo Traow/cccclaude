@@ -9,8 +9,14 @@ CM = 360000
 FONT = "Times New Roman"
 
 
+# Teksti laius on juhendi veeriste korral 15 cm; joonised on kavandatud 16 cm laiusele
+SCALE = 15.0 / 16.0
+# Juhend ei soovita joonistel taustavärve – kastid on valge taustaga, eristus raamivärviga
+NO_BG = True
+
+
 def emu(v):
-    return int(round(v * CM))
+    return int(round(v * CM * SCALE))
 
 
 class Canvas:
@@ -33,6 +39,8 @@ class Canvas:
             line_w=9525, align="center", vert="horz", rot=0):
         """Ristkülik tekstiga. cx = keskpunkti x, y = ülaserv."""
         sid = self._id()
+        if fill and NO_BG:
+            fill = "FFFFFF"
         x = cx - w / 2
         self.boxes[key] = dict(id=sid, x=x, y=y, w=w, h=h)
         paras = text.split("\n")
@@ -61,7 +69,7 @@ class Canvas:
             f'<wps:spPr><a:xfrm{rot_attr}><a:off x="{emu(x)}" y="{emu(y)}"/><a:ext cx="{emu(w)}" cy="{emu(h)}"/></a:xfrm>'
             f'<a:prstGeom prst="{geom}">{av}</a:prstGeom>{fill_xml}{line_xml}</wps:spPr>'
             f'<wps:txbx><w:txbxContent>{ptxt}</w:txbxContent></wps:txbx>'
-            f'<wps:bodyPr rot="0" vert="{vert}" wrap="square" lIns="36000" tIns="18000" rIns="36000" bIns="18000" '
+            f'<wps:bodyPr rot="0" vert="{vert}" wrap="square" lIns="18000" tIns="18000" rIns="18000" bIns="18000" '
             f'anchor="ctr" anchorCtr="0"><a:noAutofit/></wps:bodyPr></wps:wsp>'
         )
         return sid
@@ -160,40 +168,41 @@ def tree(c, rows, links, colors):
     for y, h, boxes in rows:
         for key, cx, w, text, style in boxes:
             fill, line, bold, size, dash = colors[style]
-            c.box(key, cx, y, w, h, text, fill=fill, line=line, bold=bold, size=size, dash=dash)
+            c.box(key, cx, y, w, h, text, fill=fill, line=line, bold=bold, size=size, dash=dash,
+                  line_w=28575 if style == "core" else 12700)
     for child, parent in links:
         c.connect_up(child, parent)
 
 
 def problem_tree():
-    c = Canvas("Probleemipuu", 16.0, 11.8)
+    c = Canvas("Probleemipuu", 16.0, 13.7)
     colors = {
-        "eff": (EFF2, EFF_L, False, 10, None),
+        "eff": (EFF2, EFF_L, False, 11, None),
         "core": (CORE, CORE_L, True, 11, None),
-        "cause": (CAUSE, CAUSE_L, False, 10, None),
-        "root": (ROOT, ROOT_L, False, 10, None),
+        "cause": (CAUSE, CAUSE_L, False, 11, None),
+        "root": (ROOT, ROOT_L, False, 11, None),
     }
     L = [2.70, 8.00, 13.30]
     R = [1.35, 4.05, 6.65, 9.35, 11.95, 14.65]
     rows = [
-        (0.0, 1.45, [
+        (0.0, 1.70, [
             ("T4", 4.50, 6.2, "T4. Merchandise'i ja piletimüügi potentsiaal jääb osaliselt kasutamata", "eff"),
             ("T5", 11.50, 6.2, "T5. Klubi maine ja brändi väärtus kahanevad pikas plaanis", "eff"),
         ]),
-        (2.10, 1.50, [
+        (2.45, 1.80, [
             ("T1", L[0], 4.7, "T1. Traditsioonilised fännid kritiseerivad brändi ega samastu sellega", "eff"),
             ("T2", L[1], 4.7, "T2. Fännibaas jaguneb „vanaks“ ja „uueks“ kogukonnaks", "eff"),
             ("T3", L[2], 4.7, "T3. Emotsionaalne side ja lojaalsus klubiga nõrgenevad", "eff"),
         ]),
-        (4.40, 1.30, [
+        (5.00, 1.40, [
             ("CORE", 8.0, 12.6, "PÕHIPROBLEEM: 2017. aasta rebrändingu järel on Juventuse fännibaas killustunud ega samastu ühtse identiteediga", "core"),
         ]),
-        (6.50, 1.50, [
+        (7.15, 1.80, [
             ("P1", L[0], 4.7, "P1. Uus identiteet katkestas sideme klubi ajaloo ja sümboolikaga", "cause"),
             ("P2", L[1], 4.7, "P2. Fänne ei kaasatud rebrändingu protsessi", "cause"),
             ("P3", L[2], 4.7, "P3. Brändistrateegia eelistab globaalset ärilist sihtrühma", "cause"),
         ]),
-        (8.80, 2.10, [
+        (9.75, 2.75, [
             ("P1a", R[0], 2.5, "P1a. Ovaalne vapp ja Torino härg kadusid", "root"),
             ("P1b", R[1], 2.5, "P1b. „J“-logo tundub fännidele korporatiivne", "root"),
             ("P2a", R[2], 2.5, "P2a. Muudatus esitleti valmis lahendusena", "root"),
@@ -211,9 +220,9 @@ def problem_tree():
     c.connect_up("T2", "T4")
     c.connect_up("T2", "T5")
     c.connect_up("T3", "T5")
-    c.label("lg", 8.0, 11.2, 16.0, 0.5,
-            "Oranž – tagajärjed; punakas – põhiprobleem; sinine – otsesed põhjused; hall – algpõhjused. Nool: põhjus → tagajärg.",
-            size=9, color="404040")
+    c.label("lg", 8.0, 12.7, 16.0, 0.9,
+            "Oranž raam – tagajärjed; paks raam – põhiprobleem; sinine raam – otsesed põhjused; hall raam – algpõhjused. Nool: põhjus → tagajärg.",
+            size=10, color="404040")
     return c
 
 
@@ -221,43 +230,43 @@ def problem_tree():
 # Joonis 2 – eesmärgipuu
 # ---------------------------------------------------------------------------
 def objective_tree():
-    c = Canvas("Eesmärgipuu", 16.0, 12.2)
+    c = Canvas("Eesmärgipuu", 16.0, 13.7)
     IN, IN_L = "E2EFDA", "548235"
     CORE_G, CORE_GL = "A9D18E", "385723"
     OUT, OUT_L = "FFFFFF", "7F7F7F"
     colors = {
-        "end": ("FFF2CC", "BF9000", False, 10, None),
+        "end": ("FFF2CC", "BF9000", False, 11, None),
         "core": (CORE_G, CORE_GL, True, 11, None),
-        "in": (IN, IN_L, False, 10, None),
-        "out": (OUT, OUT_L, False, 10, "dash"),
+        "in": (IN, IN_L, False, 11, None),
+        "out": (OUT, OUT_L, False, 11, "dash"),
     }
     L = [2.70, 8.00, 13.30]
     R = [1.35, 4.05, 6.65, 9.35, 11.95, 14.65]
     rows = [
-        (0.0, 1.45, [
+        (0.0, 1.70, [
             ("E4", 4.50, 6.2, "E4. Merchandise'i ja piletimüügi potentsiaal on täielikult kasutatud", "end"),
             ("E5", 11.50, 6.2, "E5. Klubi maine ja brändi väärtus kasvavad", "end"),
         ]),
-        (2.10, 1.50, [
+        (2.45, 1.80, [
             ("E1", L[0], 4.7, "E1. Traditsioonilised fännid samastuvad klubi brändiga", "end"),
-            ("E2", L[1], 4.7, "E2. Kohalikud ja globaalsed fännid moodustavad ühtse kogukonna", "end"),
+            ("E2", L[1], 4.7, "E2. Kohalikud ja globaalsed fännid on üks kogukond", "end"),
             ("E3", L[2], 4.7, "E3. Emotsionaalne side ja lojaalsus klubiga on tugevad", "end"),
         ]),
-        (4.40, 1.30, [
+        (5.00, 1.40, [
             ("CORE", 8.0, 12.6, "PEAEESMÄRK: Juventuse fännibaas on taas ühendatud ja samastub klubi identiteediga", "core"),
         ]),
-        (6.50, 1.50, [
+        (7.15, 1.80, [
             ("O1", L[0], 4.7, "O1. Identiteet ühendab klubi ajaloo ja kaasaegsuse", "in"),
             ("O2", L[1], 4.7, "O2. Fännid osalevad brändi kujundamises", "in"),
             ("O3", L[2], 4.7, "O3. Bränd teenib nii kohalikke kui ka globaalseid fänne", "in"),
         ]),
-        (8.80, 2.10, [
-            ("O1a", R[0], 2.5, "O1a. Ajalooline vapp on pärand­sümbolina kasutusel", "in"),
+        (9.75, 2.75, [
+            ("O1a", R[0], 2.5, "O1a. Ajalooline vapp on taas kasutusel", "in"),
             ("O1b", R[1], 2.5, "O1b. Põhilogo on fännide seas aktsepteeritud", "out"),
             ("O2a", R[2], 2.5, "O2a. Lahendus on fännidega koos testitud", "in"),
             ("O2b", R[3], 2.5, "O2b. Toimib alaline fännide nõukogu", "out"),
-            ("O3a", R[4], 2.5, "O3a. Merchandise'is on pärand­kollektsioon", "in"),
-            ("O3b", R[5], 2.5, "O3b. Sõnumid väärtustavad klubi pärandit", "in"),
+            ("O3a", R[4], 2.5, "O3a. Fännipoes on pärand­kollektsioon", "in"),
+            ("O3b", R[5], 2.5, "O3b. Sõnumid väärtustavad pärandit", "in"),
         ]),
     ]
     links = [("O1a", "O1"), ("O1b", "O1"), ("O2a", "O2"), ("O2b", "O2"), ("O3a", "O3"), ("O3b", "O3"),
@@ -269,10 +278,10 @@ def objective_tree():
     c.connect_up("E2", "E4")
     c.connect_up("E2", "E5")
     c.connect_up("E3", "E5")
-    c.label("lg", 8.0, 11.2, 16.0, 0.9,
-            "Kollane – soovitud püsiseisund (eesmärgid); roheline – vahendid projekti ulatuses; "
-            "kriipsjoonega – vahendid väljaspool projekti (programmi teised projektid). Nool: vahend → eesmärk.",
-            size=9, color="404040")
+    c.label("lg", 8.0, 12.7, 16.0, 0.9,
+            "Kollane raam – soovitud püsiseisund (eesmärgid); roheline raam – vahendid projekti ulatuses; "
+            "kriipsjoon – vahendid väljaspool projekti (programmi teised projektid). Nool: vahend → eesmärk.",
+            size=10, color="404040")
     return c
 
 
@@ -286,31 +295,31 @@ def stakeholder_matrix(stakeholders):
     hw, hh = W / 2, H / 2
     quads = [
         (ox, oy, "HOIA RAHUL", "FFF2CC", "top"),
-        (ox + hw, oy, "VÕTMEISIKUD – HALDA TIHEDALT", "F8CBAD", "top"),
+        (ox + hw, oy, "VÕTMEISIKUD", "F8CBAD", "top"),
         (ox, oy + hh, "JÄLGI", "E2EFDA", "bottom"),
         (ox + hw, oy + hh, "HOIA INFORMEERITUNA", "DEEAF6", "bottom"),
     ]
     for i, (x, y, t, f, where) in enumerate(quads):
-        c.box(f"Q{i}", x + hw / 2, y, hw, hh, "", fill=f, line="7F7F7F")
-        ly = y + 0.08 if where == "top" else y + hh - 0.55
-        c.label(f"QL{i}", x + hw / 2, ly, hw, 0.5, t, size=10, bold=True, color="404040")
+        c.box(f"Q{i}", x + hw / 2, y, hw, hh, "", fill=f, line="7F7F7F", line_w=12700)
+        ly = y + 0.08 if where == "top" else y + hh - 0.6
+        c.label(f"QL{i}", x + hw / 2, ly, hw, 0.5, t, size=11, bold=True, color="404040")
     c.line(ox, oy + H, ox + W + 0.3, oy + H, width=15875)
     c.line(ox, oy + H, ox, oy - 0.6, width=15875)
-    c.label("xl", ox + W / 2, oy + H + 0.1, 8.0, 0.5, "HUVI projekti vastu (1–5)", size=10, bold=True)
-    c.label("yl", ox + 2.45, 0.0, 4.4, 0.5, "MÕJU projektile (1–5)", size=10, bold=True, align="left")
-    c.label("lo", ox + 0.35, oy + H + 0.1, 0.6, 0.5, "1", size=10)
-    c.label("hi", ox + W - 0.35, oy + H + 0.1, 0.6, 0.5, "5", size=10)
+    c.label("xl", ox + W / 2, oy + H + 0.1, 8.0, 0.5, "HUVI projekti vastu (1–5)", size=11, bold=True)
+    c.label("yl", ox + 2.8, 0.0, 5.2, 0.5, "MÕJU projektile (1–5)", size=11, bold=True, align="left")
+    c.label("lo", ox + 0.35, oy + H + 0.1, 0.6, 0.5, "1", size=11)
+    c.label("hi", ox + W - 0.35, oy + H + 0.1, 0.6, 0.5, "5", size=11)
 
     # skaala: 1–3 madal pool, 4–5 kõrge pool
     frac = {1: 0.08, 2: 0.25, 3: 0.41, 4: 0.64, 5: 0.86}
     for s in stakeholders:
         text = f'{s["nr"]}. {s["short"]}'
-        w = len(text) * 0.17 + 0.45
+        w = len(text) * 0.195 + 0.5
         x = ox + W * frac[s["interest"]] + s.get("dx", 0)
         x = min(max(x, ox + w / 2 + 0.15), ox + W - w / 2 - 0.15)
         y = oy + H * (1 - frac[s["influence"]]) + s.get("dy", 0)
-        c.box("S" + str(s["nr"]), x, y - 0.27, w, 0.54, text,
-              fill="FFFFFF", line="404040", size=10, geom="roundRect")
+        c.box("S" + str(s["nr"]), x, y - 0.33, w, 0.66, text,
+              fill="FFFFFF", line="404040", size=11, geom="roundRect")
     return c
 
 
@@ -321,24 +330,24 @@ def program_figure():
     c = Canvas("Programm ja portfell", 16.0, 9.0)
     c.box("S", 8.0, 0.0, 12.0, 1.1,
           "STRATEEGIA: Juventus kui globaalne jalgpalli- ja elustiilibränd („Black and White and More“, 2017)",
-          fill="D9D9D9", line="404040", bold=True, size=10)
+          fill="D9D9D9", line="404040", bold=True, size=11)
     c.box("PR", 8.0, 1.9, 12.0, 1.1,
           "PROGRAMM „Juventus uuesti ja paremini“ – bränd ja fännisuhted (omanik: klubi juhtkond)",
-          fill="DEEAF6", line="2F5496", bold=True, size=10)
+          fill="DEEAF6", line="2F5496", bold=True, size=11)
     c.box("P1", 2.75, 4.0, 5.1, 1.9,
           "Projekt 1 (käesolev, 3 kuud): pärandvapp, kaasav disain ja lansseerimine",
-          fill="E2EFDA", line="548235", bold=True, size=10)
+          fill="E2EFDA", line="548235", bold=True, size=11)
     c.box("P2", 8.0, 4.0, 5.0, 1.9,
           "Projekt 2 (jätkuprojekt): alaline fännide nõukogu ja kogukonnaplatvorm",
-          fill="FFFFFF", line="7F7F7F", size=10, dash="dash")
+          fill="FFFFFF", line="7F7F7F", size=11, dash="dash")
     c.box("P3", 13.25, 4.0, 5.1, 1.9,
           "Projekt 3: pärandkollektsiooni täismahus tootmine ja litsentsimine",
-          fill="FFFFFF", line="7F7F7F", size=10, dash="dash")
+          fill="FFFFFF", line="7F7F7F", size=11, dash="dash")
     c.box("PF", 8.0, 6.9, 15.6, 1.9,
           "PORTFELL (ressursid ja teenused): klubi turundus- ja brändieelarve, kaubamärgiportfell, "
           "litsentsi- ja merchandise'i teenused, digikanalid; inimressurss: 8 spetsialistirolli, "
           "partnerid (tehniline partner, litsentsiaadid)",
-          fill="FBE5D6", line="C55A11", size=10)
+          fill="FBE5D6", line="C55A11", size=11)
     c.connect_up("PR", "S")
     for p in ("P1", "P2", "P3"):
         c.connect_up(p, "PR")

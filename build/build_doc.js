@@ -10,7 +10,8 @@ const { members: M, criteria, alternatives } = require("./content.js");
 const stakeholders = JSON.parse(fs.readFileSync(path.join(__dirname, "stakeholders.json"), "utf8"));
 
 const FONT = "Times New Roman";
-const TEXT_W = 9071; // 16 cm DXA
+const TEXT_W = 8504; // 15 cm DXA (juhendi veerised: vasak 4 cm, parem 2 cm)
+const HFONT = "Arial";
 
 // ---------- abifunktsioonid ----------
 // Lihtne märgendus: **paks**, *kald*
@@ -31,10 +32,12 @@ function runs(text, opts = {}) {
 }
 const P = (text, o = {}) => new Paragraph({ children: runs(text, o.run || {}), ...o.para });
 const H1 = (t, pageBreak = true) => new Paragraph({ heading: HeadingLevel.HEADING_1, pageBreakBefore: pageBreak, children: [new TextRun(t)] });
+// Lisa pealkiri: Times New Roman 12 pt rasvane, sisukorras 2. tasemel, iga lisa uuelt lehelt
+const LISA = (t, pageBreak = true) => new Paragraph({ style: "LisaPealkiri", pageBreakBefore: pageBreak, children: [new TextRun(t)] });
 const H2 = (t) => new Paragraph({ heading: HeadingLevel.HEADING_2, children: [new TextRun(t)] });
 const H3 = (t) => new Paragraph({ heading: HeadingLevel.HEADING_3, children: [new TextRun(t)] });
-const B = (t, level = 0) => new Paragraph({ numbering: { reference: "bullets", level }, children: runs(t) });
-const N = (t, ref = "num1") => new Paragraph({ numbering: { reference: ref, level: 0 }, children: runs(t) });
+const B = (t, level = 0) => new Paragraph({ numbering: { reference: "bullets", level }, spacing: { before: 0 }, children: runs(t) });
+const N = (t, ref = "num1") => new Paragraph({ numbering: { reference: ref, level: 0 }, spacing: { before: 0 }, children: runs(t) });
 const planned = (t) => new Paragraph({ style: "Planned", children: runs(t) });
 const FIG = (n) => new Paragraph({ children: [new TextRun(`§§FIG:${n}§§`)] });
 
@@ -43,6 +46,7 @@ function caption(kind, title) {
   return new Paragraph({
     style: "Caption",
     keepNext: kind === "Tabel",
+    spacing: kind === "Tabel" ? { before: 240, after: 240 } : { before: 120, after: 0 },
     children: [
       new TextRun({ text: `${kind} `, bold: true }),
       new TextRun({ text: `§SEQ:${kind}§`, bold: true }),
@@ -51,14 +55,14 @@ function caption(kind, title) {
     ],
   });
 }
-const source = (t) => new Paragraph({ style: "Source", children: runs(t) });
+const source = (t) => ({ __src: t });
 
 const border = { style: BorderStyle.SINGLE, size: 4, color: "808080" };
 const borders = { top: border, bottom: border, left: border, right: border };
 
-function cell(text, width, { header = false, fill, align = AlignmentType.LEFT, bold = false } = {}) {
+function cell(text, width, { header = false, fill, align = AlignmentType.LEFT, bold = false, keep = true } = {}) {
   const paras = String(text).split("\n").map((line) =>
-    new Paragraph({ style: "TableText", alignment: align, children: runs(line, { bold: header || bold }) }));
+    new Paragraph({ style: "TableText", alignment: align, keepNext: keep, keepLines: true, children: runs(line, { bold: header || bold }) }));
   return new TableCell({
     borders,
     width: { size: width, type: WidthType.DXA },
@@ -70,9 +74,23 @@ function cell(text, width, { header = false, fill, align = AlignmentType.LEFT, b
   });
 }
 
-function table(widths, header, rows, opts = {}) {
-  const total = widths.reduce((a, b) => a + b, 0);
+const table = (...args) => ({ __tbl: args });
+const noBorder = { style: BorderStyle.NONE, size: 0, color: "FFFFFF" };
+function buildTable(widths0, header, rows, opts = {}, note) {
+  // laiused skaleeritakse teksti laiusele (15 cm)
+  const sum0 = widths0.reduce((a, b) => a + b, 0);
+  const widths = widths0.map((w) => Math.round((w * TEXT_W) / sum0));
+  widths[widths.length - 1] += TEXT_W - widths.reduce((a, b) => a + b, 0);
+  const total = TEXT_W;
+  const noteRow = note ? [new TableRow({ cantSplit: true, children: [new TableCell({
+    columnSpan: widths.length,
+    width: { size: total, type: WidthType.DXA },
+    borders: { top: border, bottom: noBorder, left: noBorder, right: noBorder },
+    margins: { top: 40, bottom: 0, left: 0, right: 0 },
+    children: [new Paragraph({ style: "TableText", children: runs(note) })],
+  })] })] : [];
   return new Table({
+    alignment: AlignmentType.CENTER,
     width: { size: total, type: WidthType.DXA },
     columnWidths: widths,
     rows: [
@@ -81,11 +99,29 @@ function table(widths, header, rows, opts = {}) {
         cantSplit: true,
         children: r.map((v, i) => {
           const o = typeof v === "object" && v !== null && !Array.isArray(v) ? v : { t: v };
-          return cell(o.t, widths[i], { fill: o.fill || (opts.fills && opts.fills(r, i)), align: o.align || (opts.align && opts.align[i]) || AlignmentType.LEFT, bold: o.bold });
+          return cell(o.t, widths[i], { fill: o.fill || (opts.fills && opts.fills(r, i)), align: o.align || (opts.align && opts.align[i]) || AlignmentType.LEFT, bold: o.bold, keep: !opts.split });
         }),
       })),
+      ...noteRow,
     ],
   });
+}
+// Tabel + järgnev märkus ühendatakse: märkus läheb tabeli viimasesse ritta ilma nähtavate joonteta
+function finalize(items) {
+  const out = [];
+  for (let i = 0; i < items.length; i++) {
+    const it = items[i];
+    if (it && it.__tbl) {
+      const nx = items[i + 1];
+      const note = nx && nx.__src ? nx.__src : null;
+      if (note) i++;
+      const [w, h, r, o] = it.__tbl;
+      out.push(buildTable(w, h, r, o || {}, note));
+    } else if (it && it.__src) {
+      out.push(new Paragraph({ style: "TableText", children: runs(it.__src) }));
+    } else out.push(it);
+  }
+  return out;
 }
 
 const fmt = (x) => x.toFixed(2).replace(".", ",");
@@ -95,23 +131,21 @@ const gap = () => new Paragraph({ style: "TableText", children: [] });
 const children = [];
 const PJ = M.PJ, AI = M.AI, EX = M.EX, OM = M.OM;
 
-// TIITELLEHT
-const tc = (t, o = {}) => new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 0 }, children: [new TextRun({ text: t, ...o })] });
+// TIITELLEHT (Pärnu kolledži juhend 2026, lisa 9 – ainetöö)
+const tc = (t, o = {}, sp = {}) => new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 0, after: 0, ...sp }, children: [new TextRun({ text: t, ...o })] });
 children.push(
-  tc("TARTU ÜLIKOOL"), tc("Pärnu kolledž"), tc("[Õppekava nimi]"),
-  new Paragraph({ spacing: { before: 2000 }, alignment: AlignmentType.CENTER, children: [new TextRun(`${PJ}, ${AI}, ${EX}, ${OM}`)] }),
-  new Paragraph({ spacing: { before: 1800, after: 240 }, alignment: AlignmentType.CENTER, children: [new TextRun({ text: "„JUVENTUS UUESTI JA PAREMINI“: JUVENTUS FC REBRÄNDIMISE PROJEKT", bold: true, size: 28 })] }),
-  tc("Rühmatöö õppeaines „Projektijuhtimise meetodid ja tehnikad“"),
-  tc("Ülesanne 2: alapeatükk 1.2 – probleemide, eesmärkide ja huvipoolte analüüs"),
-  new Paragraph({ spacing: { before: 2400 }, alignment: AlignmentType.RIGHT, children: [new TextRun("Juhendaja: T. Tamberg")] }),
-  new Paragraph({ spacing: { before: 2600 }, alignment: AlignmentType.CENTER, children: [new TextRun("Pärnu 2026")] }),
+  tc("TARTU ÜLIKOOL"), tc("Pärnu kolledž"),
+  tc(`${PJ}, ${AI}`, {}, { before: 3200 }), tc(`${EX}, ${OM}`), tc("[kursuse lühend]"),
+  tc("„JUVENTUS UUESTI JA PAREMINI“: JUVENTUS FC REBRÄNDIMISE PROJEKT", { bold: true, size: 36 }, { before: 1000, line: 360 }),
+  tc("Rühmatöö", {}, { before: 360 }),
+  tc("Õppejõud: T. Tamberg, [kraad]", {}, { before: 2000 }),
+  tc("Pärnu 2026", {}, { before: 2400 }),
 );
 
 // SISUKORD
 children.push(
   new Paragraph({ style: "TocHeading", pageBreakBefore: true, children: [new TextRun("SISUKORD")] }),
-  new TableOfContents("Sisukord", { hyperlink: true, headingStyleRange: "1-3" }),
-  P("*Sisukord uueneb Wordis faili avamisel (vajadusel: paremklõps sisukorral → Update Field).*", { run: { color: "7F7F7F", size: 20 } }),
+  new TableOfContents("Sisukord", { hyperlink: true, headingStyleRange: "1-3", useAppliedParagraphOutlineLevel: true }),
 );
 
 // SISSEJUHATUS
@@ -130,12 +164,12 @@ children.push(
   P("Projekti idee on rebrändida Juventus FC nii, et 2017. aasta identiteedimuutuse järel killustunud fännibaas saaks uuesti ühendatud. Projekti aluseks on klubi 2017. aasta rebränding „Black and White and More“, mille eesmärk oli laiendada klubi tegevust jalgpallist kaugemale – moe, meedia ja merchandise’i valdkonda (Design Week, 2017; It’s Nice That, 2017)."),
   planned(`[Täiendatakse: ärijuhtumi esialgne kirjeldus – strateegiline sobivus, valikute hindamine, ärisuhted, tasuvus ja teostatavus (Tamberg, 2022, slaid 8–9). Vastutaja: ${PJ}.]`),
   H2("1.2. Probleemide, eesmärkide ja huvipoolte analüüs"),
-  P("Alapeatüki eesmärk on enne planeerimist veenduda, et valitakse õige projekt. Omanikul võib olla idee „teeme uue logo“, kuid projektijuht peab kindlaks tegema, kas see on eesmärgi saavutamiseks mõistlik ja efektiivne. Probleemiks loetakse lahknevust soovitava ja olemasoleva seisundi vahel **enne projekti**, mitte projekti käigus tekkida võivaid riske (Tamberg, 2022, slaid 11–12). Analüüs liigub järjekorras probleem → põhjuste analüüs → eesmärgid → huvipooled → lahendusideed → lahenduse valik (Tamberg, 2022, slaid 10)."),
 );
 
 // 1.2.1 METOODIKA
 children.push(
   H3("1.2.1. Metoodika ja kasutatud tehnikad"),
+  P("Alapeatüki eesmärk on enne planeerimist veenduda, et valitakse õige projekt. Omanikul võib olla idee „teeme uue logo“, kuid projektijuht peab kindlaks tegema, kas see on eesmärgi saavutamiseks mõistlik ja efektiivne. Probleemiks loetakse lahknevust soovitava ja olemasoleva seisundi vahel **enne projekti**, mitte projekti käigus tekkida võivaid riske (Tamberg, 2022, slaid 11–12). Analüüs liigub järjekorras probleem → põhjuste analüüs → eesmärgid → huvipooled → lahendusideed → lahenduse valik (Tamberg, 2022, slaid 10)."),
   P("Analüüsi aluseks on loogilise raamistiku lähenemine (*Logical Framework Approach*, LFA), mille järgi koostatakse esmalt probleemipuu, see teisendatakse eesmärgipuuks ja valitakse eesmärgipuust projekti ulatusse kuuluvad harud (European Commission, 2004). Rühm kasutas järgmisi tehnikaid:"),
   N("**Dokumendi- ja meediaanalüüs** – 2017. aasta rebrändingu eesmärkide ja fännide reaktsiooni kaardistamine erialameedia ja klubi teadaannete põhjal (Football Italia, 2017; Dezeen, 2017). Kvantitatiivsed näitajad (näitarvude tehnika) kogub projekti esimesel kuul turu-uuringu analüütik (Tamberg, 2022, slaid 13)."),
   N("**Ajurünnak ja 635-meetod** probleemide, põhjuste ja lahendusideede kogumiseks; kalasaba-diagrammi kategooriaid (sümboolika, protsess, strateegia, kommunikatsioon, tooted) kasutati kontrollnimekirjana (Ishikawa, 1990; Tamberg, 2022, slaid 18 ja 35)."),
@@ -154,8 +188,8 @@ children.push(
       ["5 korda miks", "Lihtne ja kiire; viib sümptomist algpõhjuseni", "Lineaarne, üks põhjusahel; oht peatuda liiga vara", "Algpõhjuste sügavuse kontroll (nt P1b)"],
       ["SWOT", "Ülevaade sise- ja väliskeskkonnast", "Ei näita põhjuslikke seoseid", "Keskkonna analüüs alapeatükis 1.3"],
     ]),
-  source(`Allikas: autorite koostatud (European Commission, 2004; Ishikawa, 1990; Ohno, 1988; Learn Lean Sigma, s.a.; LinkedIn, s.a.). Vastutaja: ${PJ}.`),
-  P(`**Tehisaru ja teaduslike lisaallikate kasutamine.** Rühm kasutas suurt keelemudelit Claude (Anthropic, 2026) töö struktuuri ja analüüsi kavandi koostamiseks, allikate leidmiseks ning valmis versioonile kriitilise tagasiside saamiseks; päringud koostas ja väljundi kvaliteeti kontrollis ${AI}. Tehisaru pakutud väited ja viited kontrolliti algallikatest; huvi- ja mõjuhinnangud ning alternatiivide hinded on rühma ekspertarvamus. Vestlus ja selle põhjal tehtud täiendused on esitatud lisas 3. Spordiklubi brändi ja fännide samastumise mõistmiseks kasutati teaduskirjandust brändiväärtusest (Keller, 1993) ja spordifännide samastumisest klubiga (Wann & Branscombe, 1993).`),
+  source(`Allikas: European Commission, 2004; Ishikawa, 1990; Ohno, 1988; Learn Lean Sigma, s.a.; LinkedIn, s.a. Vastutaja: ${PJ}.`),
+  P(`**Tehisaru ja teaduslike lisaallikate kasutamine.** Rühm kasutas suurt keelemudelit Claude (Anthropic, 2026) töö struktuuri ja analüüsi kavandi koostamiseks, allikate leidmiseks ning valmis versioonile kriitilise tagasiside saamiseks; päringud koostas ja väljundi kvaliteeti kontrollis ${AI}. Tehisaru pakutud väited ja viited kontrolliti algallikatest; huvi- ja mõjuhinnangud ning alternatiivide hinded on rühma ekspertarvamus. Vestlused tehisaruga toimusid 4. oktoobril 2026; vestlus ja selle põhjal tehtud täiendused on esitatud lisas 3. Spordiklubi brändi ja fännide samastumise mõistmiseks kasutati teaduskirjandust brändiväärtusest (Keller, 1993) ja spordifännide samastumisest klubiga (Wann & Branscombe, 1993).`),
 );
 
 // 1.2.2 PROBLEEMIPUU
@@ -163,7 +197,7 @@ children.push(
   H3("1.2.2. Probleemipuu ja probleemi lause"),
   P("Põhiprobleem määratleti esmalt erinevate huvipoolte vaatest (Tamberg, 2022, slaid 17): traditsiooniliste fännide jaoks on probleemiks klubi ajaloolise sümboolika kadumine, omaniku ja turundusosakonna jaoks brändi negatiivne vastuvõtt ning kasutamata müügipotentsiaal, sponsorite jaoks ebastabiilne meediapilt. Ühine nimetaja on see, et **2017. aasta rebrändingu järel on fännibaas killustunud ega samastu ühtse identiteediga**. Probleemipuus (joonis 1) on põhiprobleemi all kolm otsest põhjust ja kuus algpõhjust ning selle kohal tagajärjed."),
   FIG(1),
-  caption("Joonis", `Juventuse fännibaasi killustumise probleemipuu (autorite koostatud; Dezeen, 2017; Football Italia, 2017 põhjal). Vastutaja: ${EX}`),
+  caption("Joonis", `Juventuse fännibaasi killustumise probleemipuu. Allikas: Dezeen, 2017; Football Italia, 2017 põhjal. Vastutaja: ${EX}`),
   P("Algpõhjuste sügavust kontrolliti tehnikaga „5 korda miks“. Näiteks: *Miks ei samastu traditsioonilised fännid brändiga?* – Logo tundub neile anonüümne ja korporatiivne. *Miks?* – Ovaalne vapp ja Torino härg, mis olid klubi vappides aastakümneid, eemaldati (Dezeen, 2017). *Miks need eemaldati?* – Identiteet loodi eelkõige globaalse elustiilibrändi vajadustest, mitte fännide väärtustest lähtudes (Design Week, 2017). Ahel näitas, et probleem ei ole ainult logo kujundus, vaid **ajaloolise sideme ja kaasamise puudumine**. Seega ei lahendaks probleemi järjekordne „uus logo“ ilma fännide kaasamiseta."),
   P("Rühm märgib, et fännibaasi killustumise ulatust tuleb mõõta. Projekti esimesel kuul viib turu-uuringu analüütik läbi fännide küsitluse ja sotsiaalmeedia analüüsi, mis annab lähtetaseme eesmärgipuu näitajatele."),
   P("**Probleemi lause.** Ilma selle projektita ei saa Juventus oma fänne uuesti ühendada, sest 2017. aasta rebränding eemaldas klubi ajaloolise sümboolika ilma fänne kaasamata ning seab esikohale globaalse ärilise sihtrühma, mistõttu ei samastu suur osa traditsioonilisi toetajaid klubi brändiga, fännibaas jaguneb „vanaks“ ja „uueks“ kogukonnaks ning klubi kaotab lojaalsust, mainet ja müügitulu."),
@@ -174,7 +208,7 @@ children.push(
   H3("1.2.3. Eesmärgipuu ja projekti ulatus"),
   P("Eesmärgipuu (joonis 2) koostati probleemipuu negatiivsete seisundite ümbersõnastamisel soovitud, tulevikus püsivateks seisunditeks – mitte tegevusteks (Tamberg, 2022, slaid 31–34). Näiteks „uus logo on valmis“ on projekti tulem, mitte eesmärk; eesmärk on, et fännid samastuksid klubi identiteediga. Seejärel otsustati, milliste alameesmärkide saavutamine kuulub 3-kuulise projekti ulatusse ja millised jäetakse programmi teistele projektidele (vt alapeatükk 1.2.6)."),
   FIG(2),
-  caption("Joonis", `Juventuse fännibaasi taasühendamise eesmärgipuu (autorite koostatud). Vastutaja: ${OM}`),
+  caption("Joonis", `Juventuse fännibaasi taasühendamise eesmärgipuu. Vastutaja: ${OM}`),
   P("Peaeesmärgi saavutamist mõõdetakse järgmiste näitajatega (lähtetase mõõdetakse projekti 1. kuul):"),
   B("fännide samastumise indeks (küsitlus, skaala 1–8) tõuseb 6 kuu jooksul pärast lansseerimist vähemalt 1 palli võrra nii kohalike kui ka globaalsete fännide seas (Wann & Branscombe, 1993);"),
   B("brändi kohta tehtud negatiivsete sotsiaalmeediapostituste osakaal väheneb poole võrra võrreldes lähtetasemega;"),
@@ -194,19 +228,19 @@ const shRows = stakeholders.map((s) => {
     { t: s.wish },
     { t: String(s.influence), align: AlignmentType.CENTER },
     { t: s.mode },
-    { t: `**${quadrant}:** ${s.strategy.split(": ").slice(1).join(": ")}`, fill: qFill[quadrant] },
+    { t: `**${quadrant}:** ${s.strategy.split(": ").slice(1).join(": ")}` },
   ];
 });
 children.push(
   H3("1.2.4. Huvipoolte analüüs ja kaasamise strateegia"),
   P("Huvipooled leiti kontrollküsimuste abil: kelle vaated ja kogemused on asjakohased, kes on otsustajad, kes hakkavad otsuste järgi tegutsema, kelle toetus on edu jaoks oluline, kellel on õigus tulemustest kasu saada ja kes võib tunda end ohustatuna (Tamberg, 2022, slaid 22). Lähtepunktiks olid rühma määratletud huvipooled – omanikud, osanikud, mängijad, toetajad, fännid, sponsorid ning kohalik omavalitsus ja elanikud –, mida täiendati „väravavahtidega“ (kaubamärgiametid, liiga) ning meedia ja litsentsipartneritega (Tamberg, 2022, slaid 24). Huvi ja mõju hinnati skaalal 1–5 rühma konsensuse alusel; hinnangud valideeritakse projekti esimesel kuul intervjuude ja küsitlusega. Tabelis 2 on esitatud huvipoolte huvi tingimused ja kaasamise strateegia, joonisel 3 nende paiknemine mõju-huvi maatriksis (Mendelow, 1981; Eden & Ackermann, 1998)."),
   caption("Tabel", "Huvipoolte analüüs ja kaasamise strateegia"),
-  table([1900, 680, 1850, 680, 1650, 2311],
-    ["Huvipool", "Huvi (1–5)", "Huvi (osalemise, toetamise) tingimus", "Mõju (1–5)", "Osalemise või mõju viis", "Kaasamise strateegia"],
-    shRows),
-  source(`Allikas: autorite koostatud (Tamberg, 2022, slaid 28; Mendelow, 1981). Värv vastab maatriksi ruudule joonisel 3. Vastutaja: ${PJ}.`),
+  table([1850, 760, 1800, 760, 1600, 2311],
+    ["Huvipool", "Huvi\n(1–5)", "Huvi (osalemise, toetamise) tingimus", "Mõju\n(1–5)", "Osalemise või mõju viis", "Kaasamise strateegia"],
+    shRows, { split: true }),
+  source(`Allikas: Tamberg, 2022, slaid 28; Mendelow, 1981. Vastutaja: ${PJ}.`),
   FIG(3),
-  caption("Joonis", `Huvipoolte mõju-huvi maatriks (autorite koostatud Mendelow, 1981 ja Tamberg, 2022, slaid 29 põhjal). Vastutaja: ${PJ}`),
+  caption("Joonis", `Huvipoolte mõju-huvi maatriks. Allikas: Mendelow, 1981; Tamberg, 2022, slaid 29 põhjal. Vastutaja: ${PJ}`),
   P("**Erinevasuunalised huvid.** Huvipoolte eesmärgid peavad olema ühitatavad (Tamberg, 2022, slaid 21), kuid rebrändingu puhul vastanduvad need tugevalt (tabel 3). Kõige teravam on vastuolu traditsiooniliste fännide, kes soovivad vana vapi tagasitoomist, ning omaniku ja turundusosakonna vahel, kes soovivad kaitsta 2017. aasta investeeringut ja globaalset brändi. Projektijuhi ülesanne on vastuolud varakult nähtavaks teha ja leida kokkulepped, mille korral ühine huvi – tugev ja ühtne fännibaas – kaalub üles erihuvid (Bryson, 2004)."),
   caption("Tabel", "Huvipoolte vastandlikud huvid ja kavandatud kokkulepped"),
   table([2300, 3100, 3671],
@@ -218,7 +252,7 @@ children.push(
       ["Linna sümbol vs klubi kaubamärk", "Torino linn (9) soovib härja sümboli korrektset kasutust; klubi soovib kaubamärgiõigust", "Kaubamärgiõiguse spetsialist selgitab kasutusõiguse ja vajadusel sõlmitakse linnaga kasutuskokkulepe"],
       ["Kulu vs tulu", "Osanikud (3) soovivad kulude põhjendatust; fännid kvaliteetset lahendust", "Eelarve 96 800 € koos reserviga, mõõdetavad näitajad ja etapiviisiline otsustamine"],
     ]),
-  source(`Allikas: autorite koostatud. Sulgudes on huvipoole number tabelist 2. Vastutaja: ${PJ}.`),
+  source(`Märkus: sulgudes on huvipoole number tabelist 2. Vastutaja: ${PJ}.`),
   P("**Kaasamise strateegia.** Kaasamise intensiivsus valiti vastavalt mõjukuse ja huvi määrale (Mendelow, 1981) ning IAP2 kaasamise spektri tasemetele – informeerimine, konsulteerimine, kaasamine, koostöö ja otsustusõiguse andmine (IAP2, 2018):"),
   B("**Võtmeisikud** (1, 2, 8) – koostöö: juhtkomitee liikmed, kes kinnitavad iga etapi lõpus lahenduse ja ärijuhtumi aktuaalsuse; sponsoritega lepitakse kokku tootmis- ja üleminekugraafik."),
   B("**Hoia rahul** (11, 12) – konsulteerimine: meedia saab eelinfot ja lugusid suhtekorraldusplaani järgi; kaubamärgiametitele esitatakse nõuetekohased taotlused juba 1. kuul, et vältida „väravavahtide“ tekitatud viivitusi (Tamberg, 2022, slaid 24)."),
@@ -249,7 +283,7 @@ children.push(
   table([2411, 860, 860, 860, 860, 860, 860, 1500],
     ["Alternatiiv", ...criteria.map((c) => `${c.id}\n${Math.round(c.w * 100)}%`), "Kaalutud summa"],
     altRows),
-  source(`Kriteeriumid: ${criteria.map((c) => `${c.id} – ${c.name}`).join("; ")}. Allikas: autorite koostatud. Vastutaja: ${OM} (kaasteostaja ${EX}).`),
+  source(`Märkus: kriteeriumid ${criteria.map((c) => `${c.id} – ${c.name}`).join("; ")}. Vastutaja: ${OM} (kaasteostaja ${EX}).`),
   P(`Kaalutud summa järgi on parim kombinatsioon **B+D** (${fmt(A_["B+D"].total)}), sellele järgneb alternatiiv B (${fmt(A_.B.total)}). Vana vapi täielik taastamine (A, ${fmt(A_.A.total)}) rahuldaks küll traditsioonilisi fänne, kuid tühistaks 2017. aasta investeeringu, tekitaks vastuseisu omanikus ja sponsorites ning ei mahu 96 800-eurose eelarve ja 3 kuu sisse, sest kõik kaubamärgid, tooted ja kanalid tuleks ümber teha. Samal põhjusel jääb eelarvest ja ajast välja uue logo loomine (C, ${fmt(A_.C.total)}). Ainult kommunikatsioon (D, ${fmt(A_.D.total)}) on odav ja kiire, kuid ei kõrvalda algpõhjust P1 – ajaloolise sümboolika puudumist.`),
   P(`Tundlikkusanalüüs: kui eelarve kriteeriumi kaal tõsta 30%-ni, jääb B+D endiselt parimaks (${fmt(A_["B+D"].sensCost)}; B ${fmt(A_.B.sensCost)}, D ${fmt(A_.D.sensCost)}). Riski kaalu tõstmine 25%-ni järjestust ei muuda (B+D ${fmt(A_["B+D"].sensRisk)}). Seega on otsus kaalude suhtes stabiilne ning projekti omanikule soovitatakse alternatiivi **B+D**.`),
   P("Alternatiivid täidavad eesmärgipuu alameesmärke erinevalt (tabel 5): A ja B katavad sümboolika haru, C ja D kaasamise ja kommunikatsiooni haru. Ainult kombinatsioon katab kõik kolm haru."),
@@ -265,7 +299,8 @@ children.push(
       ["0 – nullalternatiiv", "0", "0", "0", "0", "0", "0", "0,0"],
     ].map((r) => r.map((v, i) => ({ t: v, align: i ? AlignmentType.CENTER : AlignmentType.LEFT }))),
   ),
-  source(`Märkus: 1 – täielik panus, 0,5 – osaline panus, 0 – panus puudub; tähised vastavad joonisele 2. Allikas: autorite koostatud. Vastutaja: ${OM}.`),
+  source(`Märkus: 1 – täielik panus, 0,5 – osaline panus, 0 – panus puudub; tähised vastavad joonisele 2. Vastutaja: ${OM}.`),
+  P("Valitud alternatiivi seost klubi strateegia, programmi ja portfelliga ning ärijuhtumi seiret käsitletakse järgmises alapeatükis."),
 );
 
 // 1.2.6 ÄRIJUHTUM, PROGRAMM, PORTFELL
@@ -274,12 +309,13 @@ children.push(
   P("Projekti omanikul võib olla idee, kuid projektijuhi ülesanne on tagada, et kavandatav töö viib omaniku ja huvipoolte eesmärgile võimalikult efektiivselt lähemale (Tamberg, 2022, slaid 8; AXELOS, 2017). Analüüsi tulemusel tehakse omanikule ettepanek mitte luua täiesti uut logo, vaid taastada klubi ajalooline sümboolika pärandvapina ja kaasata fännid lahenduse loomisse."),
   P("Projekt kuulub programmi „Juventus uuesti ja paremini“, mis teenib klubi strateegilist eesmärki olla nii tugev jalgpalliklubi kui ka globaalne elustiilibränd (joonis 4). Programm võimaldab ühitada mitut omavahel seotud projekti: käesolev 3-kuuline projekt loob pärandvapi ja lansseerib selle, jätkuprojektid loovad alalise fännide nõukogu ja pärandkollektsiooni täismahus tootmise. Portfelli tasandil otsustatakse, milliseid klubi ressursse (brändi- ja turunduseelarve, kaubamärgiportfell, litsentsi- ja merchandise’i teenused, digikanalid) projektidele eraldatakse (PMI, 2021; ISO, 2012)."),
   FIG(4),
-  caption("Joonis", `Projekti seos strateegia, programmi ja portfelliga (autorite koostatud). Vastutaja: ${PJ}`),
+  caption("Joonis", `Projekti seos strateegia, programmi ja portfelliga. Vastutaja: ${PJ}`),
   P("Ärijuhtumi aktuaalsust ja projekti sisu adekvaatsust jälgitakse kogu projekti vältel paindlikult:"),
   B("iga kuu lõpus (PRINCE2 etapipiir) vaatab juhtkomitee üle probleemi- ja eesmärgipuu, huvipoolte registri ja näitajad ning otsustab jätkamise, muutmise või lõpetamise (AXELOS, 2017);"),
   B("1. kuu turu-uuringu tulemused on otsustuspunkt: kui fännid ei toeta pärandvapi ideed, hinnatakse alternatiivid uuesti;"),
   B("disaini testitakse fännidega iteratiivselt (kaks vooru) ja lahendust kohandatakse tagasiside põhjal;"),
   B("kui väliskeskkond muutub (nt omaniku strateegia, sponsorlepingud või kaubamärgiõiguslik takistus), muudetakse vajadusel projekti ulatust või programmi koosseisu."),
+  P("Selline seire tagab, et projekt püsib ka muutuvas keskkonnas omaniku ja huvipoolte eesmärkidega kooskõlas ning ressursse ei kulutata lahendusele, mis on oma aktuaalsuse kaotanud."),
 );
 
 // 1.3–3
@@ -313,7 +349,7 @@ children.push(
   table([2600, 4671, 1800],
     ["Roll", "Vastutus", "Kaasatus"],
     team.map((r) => r.map((v) => ({ t: v })))),
-  source(`Allikas: autorite koostatud. Vastutaja: ${PJ}.`),
+  source(`Märkus: vastutaja ${PJ}.`),
   planned(`[Täiendatakse: projekti eesmärk ja tulemid, ulatus ja piirid, projekti organisatsioon ja juhtkomitee. Vastutaja: ${PJ}.]`),
   H1("2. PROJEKTI PLANEERIMINE"),
   H2("2.1. Projekti ulatus ja tööde struktuur"),
@@ -330,7 +366,8 @@ children.push(
       ...budget.map(([k, v]) => [{ t: k }, { t: eur(v), align: AlignmentType.RIGHT }, { t: `${Math.round((v / btotal) * 100)}%`, align: AlignmentType.RIGHT }]),
       [{ t: "**Kokku**" }, { t: `**${eur(btotal)}**`, align: AlignmentType.RIGHT }, { t: "**100%**", align: AlignmentType.RIGHT }],
     ]),
-  source(`Allikas: autorite koostatud. Kategooriate jaotus on esialgne ja täpsustatakse planeerimisel. Vastutaja: ${OM}.`),
+  source(`Märkus: kategooriate jaotus on esialgne ja täpsustatakse planeerimisel. Vastutaja: ${OM}.`),
+  P("Reserv moodustab ligikaudu 9% eelarvest ja seda kasutatakse ainult juhtkomitee otsusel."),
   H2("2.4. Riskide, kvaliteedi ja kommunikatsiooni juhtimine"),
   planned("[Eeldatav sisu: riskijuhtimise plaan, kvaliteedikriteeriumid, kommunikatsiooniplaan huvipoolte analüüsi põhjal.]"),
   H1("3. PROJEKTI ELLUVIIMINE, SEIRE JA LÕPETAMINE"),
@@ -346,7 +383,7 @@ children.push(
 
 // KASUTATUD ALLIKAD
 const refs = [
-  "Anthropic. (2026). *Claude* [Suur keelemudel]. https://claude.ai",
+  "Anthropic. (2026). *Claude* (oktoobri versioon) [suur keelemudel]. https://claude.ai",
   "AXELOS. (2017). *Managing successful projects with PRINCE2* (6th ed.). TSO.",
   "Bryson, J. M. (2004). What to do when stakeholders matter: Stakeholder identification and analysis techniques. *Public Management Review, 6*(1), 21–53. https://doi.org/10.1080/14719030410001675722",
   "Design Week. (2017, jaanuar). *Juventus seeks to go “beyond football” with new brand*. https://www.designweek.co.uk/issues/16-22-january-2017/juventus-seeks/",
@@ -371,7 +408,7 @@ const refs = [
   "The Drum. (2017). *Juventus upset fans after rebranding their famous club crest*. https://www.thedrum.com/news/juventus-upset-fans-after-rebranding-their-famous-club-crest",
   "Wann, D. L., & Branscombe, N. R. (1993). Sports fans: Measuring degree of identification with their team. *International Journal of Sport Psychology, 24*(1), 1–17.",
 ];
-children.push(H1("KASUTATUD ALLIKAD"), ...refs.map((r) => new Paragraph({ style: "Reference", children: runs(r) })));
+children.push(H1("VIIDATUD ALLIKAD"), ...refs.map((r) => new Paragraph({ style: "Reference", children: runs(r) })));
 
 // LISAD
 const tasks = [
@@ -388,15 +425,14 @@ const tasks = [
 ];
 children.push(
   H1("LISAD"),
-  H2("Lisa 1. Rühma tööjaotus ja vahetähtajad"),
+  LISA("Lisa 1. Rühma tööjaotus ja vahetähtajad", false),
   P(`Rühma juht (projektijuht) on ${PJ}, omaniku rolli täidab ${OM}, valdkonna eksperdina tegutseb ${EX} ning tehisaru päringute ja kvaliteedikontrolli eest (sh vormistus) vastutab ${AI}. Peamine töökanal on Google Workspace, kus hoitakse töö versioone, tabeleid ja tehisaruga peetud vestlusi; toetav kanal kiireks suhtluseks on Facebook Messengeri grupp.`),
-  caption("Tabel", "Tööjaotus, vastutajad ja vahetähtajad"),
-  table([500, 3771, 1900, 1300, 1600],
+  table([450, 3400, 1900, 1600, 1450],
     ["Nr", "Ülesanne või objekt", "Vastutaja", "Kaasteostaja", "Vahetähtaeg"],
     tasks.map((r) => r.map((v, i) => ({ t: v, align: [0, 4].includes(i) ? AlignmentType.CENTER : AlignmentType.LEFT })))),
-  source("Allikas: autorite koostatud. Kuupäevad on esialgsed ja täpsustatakse vastavalt õppeaine tähtajale."),
+  source("Märkus: kuupäevad on esialgsed ja täpsustatakse vastavalt õppeaine tähtajale."),
 
-  H2("Lisa 2. Töö õppetunnid"),
+  LISA("Lisa 2. Töö õppetunnid"),
   P("**Miks on korrektne vormistus selle ülesande juures oluline?** Rebrändingu projektis on visuaalne ja täpne esitus sisu osa: probleemi- ja eesmärgipuud ning huvipoolte maatriksit kasutatakse omaniku ja huvipooltega kokkulepete tegemisel. Joondatud kastid, ühtne kirjasuurus ja kastide külge kinnitatud ühendajad muudavad põhjus–tagajärg seosed üheselt loetavaks ning võimaldavad joonist kiiresti muuta. Pealdised ja viited tagavad, et tekstis saab objektidele viidata ja lugeja eristab rühma hinnanguid allikatest pärit faktidest."),
   P("**Milliseid oskusi arendasime?** Probleemi eristamist riskist, põhjuslike seoste modelleerimist, eesmärkide sõnastamist püsiseisunditena (mitte „uus logo“), huvipoolte hindamist ja vastandlike huvide ühitamist, kaalutud otsustusanalüüsi koos tundlikkusanalüüsiga, Wordi jooniste ala ja pealdiste kasutamist ning tehisaru väljundi kriitilist hindamist."),
   P("**Mis toetas ja mis takistas õppimist?** Toetasid slaidikogu näited (slaid 17, 29 ja 33), rühmaliikmete rollijaotus (omanik, ekspert, projektijuht, kvaliteedikontroll) ning tehisaru kiire tagasiside. Takistasid see, et fännibaasi killustumise kohta puuduvad avalikud kvantitatiivsed andmed (need tuleb koguda turu-uuringuga), ning see, et huvi- ja mõjuhinnangud on subjektiivsed, kuni neid pole huvipooltega valideeritud."),
@@ -404,7 +440,7 @@ children.push(
   P("**Millist tagasisidet saime tehisarult ja kas täiendasime tööd?** Tehisaru tagasiside ja selle põhjal tehtud muudatused on esitatud lisas 3."),
   P("**Kuidas tagasime rühmas usalduse ja vastutuse?** Usalduse ja vastutuse tagame teadmisega, et meil kõigil on ühine eesmärk – omandada kõrgharidus. Lisaks on igal objektil nimeline vastutaja ja kaasteostaja (lisa 1), kes kontrollib vastutaja tööd enne vahetähtaega. Kõik versioonid ja tehisaruga peetud vestlused on Google Workspace’is kõigile nähtavad ning kiired küsimused lahendatakse Messengeri grupis, mis loob läbipaistvuse ja võimaldab iga liikme panust hinnata."),
 
-  H2("Lisa 3. Vestlus tehisaruga ja selle põhjal tehtud täiendused"),
+  LISA("Lisa 3. Vestlus tehisaruga ja selle põhjal tehtud täiendused"),
   P(`Tehisaruna kasutati keelemudelit Claude (Anthropic, 2026); päringud koostas ${AI}. Allpool on vestluse sisu lühendatult; täielik vestlus on rühma Google Workspace’i kaustas kõigile liikmetele nähtav.`),
   P("**Päring 1 (lühendatult):** „Vaadake üle slaidikogu 2 slaidid 1–36 ning muud seonduvad juhendid. Esitage terviklikku peatükkide struktuuri sisaldav DOCX-fail, milles on alapeatükk 1.2: metoodika, probleemide puu, eesmärkide puu, huvigruppide tabel ja kaasamise strateegia, alternatiivide võrdlus; lisad tööjaotuse ja õppetundidega.“"),
   P("**Päring 2 (lühendatult):** „Meie projekt on Juventus FC rebrändimine „Juventus uuesti ja paremini“. 2017. aasta rebränding põhjustas fännibaasi killustumise. Meeskond: Herman Ra Truvek (projektijuht), Robi Mustsaar (AI prompter/kvaliteedikontroll), Hugo-Christopher Saar (ekspert), Ragnar Dietrich (omanik). Huvipooled, kaheksa spetsialistirolli, eelarve ca 96 800 € (7 kulukategooriat, ca 9000 € reserv), teostusfaas 3 kuud.“"),
@@ -429,43 +465,45 @@ const doc = new Document({
       document: { run: { font: FONT, size: 24 }, paragraph: { spacing: { line: 360, after: 120 } } },
     },
     paragraphStyles: [
-      { id: "Normal", name: "Normal", run: { font: FONT, size: 24 }, paragraph: { spacing: { line: 360, after: 120 }, alignment: AlignmentType.JUSTIFIED } },
+      { id: "Normal", name: "Normal", run: { font: FONT, size: 24 }, paragraph: { spacing: { before: 240, after: 0, line: 360 }, alignment: AlignmentType.JUSTIFIED } },
       { id: "Heading1", name: "Heading 1", basedOn: "Normal", next: "Normal", quickFormat: true,
-        run: { size: 28, bold: true, font: FONT, allCaps: false }, paragraph: { spacing: { before: 0, after: 360 }, alignment: AlignmentType.LEFT, outlineLevel: 0, keepNext: true } },
+        run: { size: 32, bold: true, font: HFONT, allCaps: true }, paragraph: { spacing: { before: 1440, after: 0 }, alignment: AlignmentType.LEFT, outlineLevel: 0, keepNext: true } },
       { id: "Heading2", name: "Heading 2", basedOn: "Normal", next: "Normal", quickFormat: true,
-        run: { size: 24, bold: true, font: FONT }, paragraph: { spacing: { before: 360, after: 240 }, alignment: AlignmentType.LEFT, outlineLevel: 1, keepNext: true } },
+        run: { size: 28, bold: true, font: HFONT }, paragraph: { spacing: { before: 480, after: 0 }, alignment: AlignmentType.LEFT, outlineLevel: 1, keepNext: true } },
       { id: "Heading3", name: "Heading 3", basedOn: "Normal", next: "Normal", quickFormat: true,
-        run: { size: 24, bold: true, font: FONT }, paragraph: { spacing: { before: 240, after: 120 }, alignment: AlignmentType.LEFT, outlineLevel: 2, keepNext: true } },
+        run: { size: 24, bold: true, font: HFONT }, paragraph: { spacing: { before: 480, after: 0 }, alignment: AlignmentType.LEFT, outlineLevel: 2, keepNext: true } },
+      { id: "LisaPealkiri", name: "Lisa pealkiri", basedOn: "Normal", next: "Normal", quickFormat: true,
+        run: { size: 24, bold: true, font: FONT }, paragraph: { spacing: { before: 240, after: 0 }, alignment: AlignmentType.LEFT, outlineLevel: 1, keepNext: true } },
       { id: "Caption", name: "caption", basedOn: "Normal", next: "Normal", quickFormat: true,
-        run: { size: 24, bold: false, italics: false, color: "000000" }, paragraph: { spacing: { before: 120, after: 120, line: 240 }, alignment: AlignmentType.LEFT } },
-      { id: "Source", name: "Allikas", basedOn: "Normal", next: "Normal",
-        run: { size: 20 }, paragraph: { spacing: { before: 60, after: 240, line: 240 }, alignment: AlignmentType.LEFT } },
+        run: { size: 24, bold: false, italics: false, color: "000000" }, paragraph: { spacing: { before: 120, after: 0, line: 360 }, alignment: AlignmentType.LEFT } },
       { id: "TableText", name: "Tabeli tekst", basedOn: "Normal",
-        run: { size: 20 }, paragraph: { spacing: { before: 0, after: 0, line: 240 }, alignment: AlignmentType.LEFT } },
+        run: { size: 22 }, paragraph: { spacing: { before: 0, after: 0, line: 240 }, alignment: AlignmentType.LEFT } },
       { id: "Planned", name: "Eeldatav sisu", basedOn: "Normal",
         run: { italics: true, color: "7F7F7F" } },
       { id: "Reference", name: "Allikaloend", basedOn: "Normal",
-        paragraph: { indent: { left: 567, hanging: 567 }, alignment: AlignmentType.LEFT } },
-      { id: "TocHeading", name: "TOC Heading", basedOn: "Normal", run: { size: 28, bold: true }, paragraph: { spacing: { after: 360 } } },
+        paragraph: { spacing: { before: 0 }, indent: { left: 567, hanging: 567 }, alignment: AlignmentType.LEFT } },
+      { id: "TocHeading", name: "TOC Heading", basedOn: "Normal", run: { size: 32, bold: true, font: HFONT }, paragraph: { spacing: { before: 1440, after: 240 }, alignment: AlignmentType.LEFT } },
+      ...[1, 2, 3].map((n) => ({ id: `TOC${n}`, name: `toc ${n}`, basedOn: "Normal", next: "Normal",
+        run: { font: FONT, size: 24 }, paragraph: { spacing: { before: 0, after: 0, line: 360 }, indent: { left: (n - 1) * 284 }, alignment: AlignmentType.LEFT } })),
     ],
   },
   numbering: {
     config: [
-      { reference: "bullets", levels: [{ level: 0, format: LevelFormat.BULLET, text: "•", alignment: AlignmentType.LEFT, style: { paragraph: { indent: { left: 567, hanging: 283 } } } }] },
-      { reference: "num1", levels: [{ level: 0, format: LevelFormat.DECIMAL, text: "%1.", alignment: AlignmentType.LEFT, style: { paragraph: { indent: { left: 567, hanging: 283 } } } }] },
-      { reference: "num2", levels: [{ level: 0, format: LevelFormat.DECIMAL, text: "%1.", alignment: AlignmentType.LEFT, style: { paragraph: { indent: { left: 567, hanging: 283 } } } }] },
+      { reference: "bullets", levels: [{ level: 0, format: LevelFormat.BULLET, text: "•", alignment: AlignmentType.LEFT, style: { paragraph: { spacing: { before: 0 }, indent: { left: 360, hanging: 360 } } } }] },
+      { reference: "num1", levels: [{ level: 0, format: LevelFormat.DECIMAL, text: "%1.", alignment: AlignmentType.LEFT, style: { paragraph: { spacing: { before: 0 }, indent: { left: 360, hanging: 360 } } } }] },
+      { reference: "num2", levels: [{ level: 0, format: LevelFormat.DECIMAL, text: "%1.", alignment: AlignmentType.LEFT, style: { paragraph: { spacing: { before: 0 }, indent: { left: 360, hanging: 360 } } } }] },
     ],
   },
   sections: [{
     properties: {
       titlePage: true,
-      page: { size: { width: 11906, height: 16838 }, margin: { top: 1418, bottom: 1418, left: 1701, right: 1134, footer: 709 } },
+      page: { size: { width: 11906, height: 16838 }, margin: { top: 1701, bottom: 1701, left: 2268, right: 1134, footer: 851 } },
     },
     footers: {
       default: new Footer({ children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ children: [PageNumber.CURRENT] })] })] }),
       first: new Footer({ children: [new Paragraph("")] }),
     },
-    children,
+    children: finalize(children),
   }],
 });
 
