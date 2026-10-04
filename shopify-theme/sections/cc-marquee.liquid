@@ -1,0 +1,173 @@
+{%- liquid
+  assign items = section.settings.items | split: '|'
+-%}
+
+<section
+  class="cc-section cc-marquee cc-marquee--{{ section.settings.style }}"
+  style="--cc-speed: {{ section.settings.speed }}s; --cc-dir: {% if section.settings.reverse %}reverse{% else %}normal{% endif %}; --cc-tilt: {{ section.settings.tilt }}deg;"
+  aria-label="{{ items | join: ', ' | escape }}"
+>
+  <div class="cc-marquee__band">
+    <div class="cc-marquee__skew">
+      <div class="cc-marquee__track" aria-hidden="true">
+        {%- for n in (1..2) -%}
+          <div class="cc-marquee__group">
+            {%- for i in (1..3) -%}
+              {%- for item in items -%}
+                <span class="cc-marquee__item{% cycle '', ' cc-marquee__item--outline' %}">{{ item | strip | escape }}</span>
+                <span class="cc-marquee__star">&#10022;</span>
+              {%- endfor -%}
+            {%- endfor -%}
+          </div>
+        {%- endfor -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .cc-marquee {
+    padding: clamp(28px, 4vw, 56px) 0;
+    overflow: hidden;
+  }
+
+  .cc-marquee__band {
+    transform: rotate(var(--cc-tilt));
+    margin: 0 -4vw;
+    border-block: 1px solid var(--cc-line);
+    padding: 18px 0;
+  }
+
+  .cc-marquee--solid .cc-marquee__band {
+    background: var(--cc-fg);
+    color: var(--cc-bg);
+    border-color: transparent;
+  }
+
+  .cc-marquee__skew {
+    transform: skewX(var(--cc-skew, 0deg));
+    transition: transform 0.4s var(--cc-ease);
+  }
+
+  .cc-marquee__track {
+    display: flex;
+    width: max-content;
+    animation: cc-marquee var(--cc-speed) linear infinite;
+    animation-direction: var(--cc-dir);
+  }
+
+  .cc-marquee:hover .cc-marquee__track {
+    animation-play-state: paused;
+  }
+
+  .cc-marquee__group {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .cc-marquee__item {
+    padding: 0 0.45em;
+    font-family: var(--cc-display);
+    font-weight: 800;
+    font-size: clamp(1.8rem, 4.6vw, 4.4rem);
+    letter-spacing: -0.03em;
+    line-height: 1;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .cc-marquee__item--outline {
+    color: transparent;
+    -webkit-text-stroke: 1px currentColor;
+  }
+
+  .cc-marquee--solid .cc-marquee__item--outline {
+    -webkit-text-stroke-color: var(--cc-bg);
+  }
+
+  .cc-marquee--line .cc-marquee__item--outline {
+    -webkit-text-stroke-color: var(--cc-fg);
+  }
+
+  .cc-marquee__star {
+    display: inline-block;
+    padding: 0 0.6em;
+    font-size: clamp(1rem, 2vw, 1.8rem);
+    color: var(--cc-accent);
+    animation: cc-spin 6s linear infinite;
+  }
+
+  .cc-marquee--solid .cc-marquee__star {
+    color: var(--cc-bg);
+  }
+
+  @keyframes cc-marquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @keyframes cc-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Scrolling text",
+  "tag": "div",
+  "settings": [
+    {
+      "type": "text",
+      "id": "items",
+      "label": "Words",
+      "info": "Separate with |",
+      "default": "New drop|Oversized fit|Three colourways|Limited run"
+    },
+    {
+      "type": "select",
+      "id": "style",
+      "label": "Style",
+      "options": [
+        { "value": "line", "label": "Outline band" },
+        { "value": "solid", "label": "Solid band" }
+      ],
+      "default": "line"
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "label": "Loop duration",
+      "min": 10,
+      "max": 80,
+      "step": 2,
+      "unit": "s",
+      "default": 34
+    },
+    {
+      "type": "range",
+      "id": "tilt",
+      "label": "Tilt",
+      "min": -4,
+      "max": 4,
+      "step": 1,
+      "unit": "°",
+      "default": 0
+    },
+    {
+      "type": "checkbox",
+      "id": "reverse",
+      "label": "Scroll the other way",
+      "default": false
+    }
+  ],
+  "presets": [
+    {
+      "name": "Scrolling text"
+    }
+  ]
+}
+{% endschema %}

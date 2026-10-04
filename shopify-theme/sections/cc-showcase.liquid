@@ -1,0 +1,420 @@
+{%- liquid
+  assign p = section.settings.product
+  assign color_option = p.options_by_name['Color'] | default: p.options_by_name['Colour']
+  assign size_option = p.options_by_name['Size']
+  assign current = p.selected_or_first_available_variant
+  if color_option
+    assign color_key = 'option' | append: color_option.position
+  endif
+  if size_option
+    assign size_key = 'option' | append: size_option.position
+  endif
+-%}
+
+{%- if p != blank -%}
+  <section class="cc-section cc-showcase" data-cc-showcase>
+    <div class="cc-showcase__inner">
+      <div class="cc-showcase__visual" data-cc-reveal="scale">
+        <div class="cc-showcase__card" data-cc-tilt>
+          <span class="cc-showcase__tint" aria-hidden="true"></span>
+          <span class="cc-showcase__shine" aria-hidden="true"></span>
+          {%- if color_option -%}
+            {%- for value in color_option.values -%}
+              {%- liquid
+                assign vname = value | append: ''
+                assign v = p.variants | where: color_key, vname | first
+                assign img = v.featured_media | default: p.featured_media
+                assign is_current = false
+                if current[color_key] == vname
+                  assign is_current = true
+                endif
+              -%}
+              <div class="cc-showcase__slide{% if is_current %} is-active{% endif %}" data-cc-slide="{{ vname | escape }}">
+                {%- if img -%}
+                  {{
+                    img
+                    | image_url: width: 1400
+                    | image_tag:
+                      class: 'cc-showcase__img cc-blend',
+                      loading: 'lazy',
+                      sizes: '(min-width: 990px) 50vw, 100vw',
+                      widths: '500, 800, 1100, 1400',
+                      alt: vname
+                  }}
+                {%- endif -%}
+              </div>
+            {%- endfor -%}
+          {%- elsif p.featured_media -%}
+            <div class="cc-showcase__slide is-active">
+              {{ p.featured_media | image_url: width: 1400 | image_tag: class: 'cc-showcase__img cc-blend', loading: 'lazy' }}
+            </div>
+          {%- endif -%}
+        </div>
+      </div>
+
+      <div class="cc-showcase__info">
+        <p class="cc-eyebrow" data-cc-reveal>{{ section.settings.eyebrow | escape }}</p>
+        <h2 class="cc-showcase__title" data-cc-split>{{ p.title | escape }}</h2>
+
+        <p class="cc-showcase__price" data-cc-reveal style="--cc-i: 1">
+          <span data-cc-price>{{ current.price | money }}</span>
+          {%- if current.compare_at_price > current.price -%}
+            <s>{{ current.compare_at_price | money }}</s>
+          {%- endif -%}
+        </p>
+
+        {%- form 'product', p, class: 'cc-showcase__form', data-cc-reveal: '', style: '--cc-i: 2' -%}
+          <input type="hidden" name="id" value="{{ current.id }}">
+          <input type="hidden" name="quantity" value="1">
+
+          {%- if color_option -%}
+            <fieldset class="cc-showcase__group">
+              <legend>
+                {{ color_option.name }}: <strong data-cc-color-label>{{ current[color_key] }}</strong>
+              </legend>
+              <div class="cc-showcase__swatches">
+                {%- for value in color_option.values -%}
+                  {%- liquid
+                    assign vname = value | append: ''
+                    assign key = vname | downcase
+                    case key
+                      when 'black'
+                        assign swatch = '#111111'
+                        assign tint = 'rgba(120,120,120,.18)'
+                      when 'light gray', 'light grey', 'grey', 'gray'
+                        assign swatch = '#c4c4c1'
+                        assign tint = 'rgba(200,200,196,.22)'
+                      when 'beige', 'sand', 'taupe'
+                        assign swatch = '#b8a68b'
+                        assign tint = 'rgba(200,175,135,.26)'
+                      else
+                        assign swatch = '#666666'
+                        assign tint = 'rgba(255,255,255,.12)'
+                    endcase
+                  -%}
+                  <button
+                    type="button"
+                    class="cc-swatch{% if current[color_key] == vname %} is-active{% endif %}"
+                    data-cc-color="{{ vname | escape }}"
+                    data-cc-tint="{{ tint }}"
+                    aria-pressed="{% if current[color_key] == vname %}true{% else %}false{% endif %}"
+                    aria-label="{{ vname | escape }}"
+                    style="--cc-swatch: {{ swatch }}"
+                  ></button>
+                {%- endfor -%}
+              </div>
+            </fieldset>
+          {%- endif -%}
+
+          {%- if size_option -%}
+            <fieldset class="cc-showcase__group">
+              <legend>{{ size_option.name }}</legend>
+              <div class="cc-showcase__sizes">
+                {%- for value in size_option.values -%}
+                  {%- assign vname = value | append: '' -%}
+                  <button
+                    type="button"
+                    class="cc-size{% if current[size_key] == vname %} is-active{% endif %}"
+                    data-cc-size="{{ vname | escape }}"
+                    aria-pressed="{% if current[size_key] == vname %}true{% else %}false{% endif %}"
+                  >
+                    {{ vname }}
+                  </button>
+                {%- endfor -%}
+              </div>
+            </fieldset>
+          {%- endif -%}
+
+          <div class="cc-showcase__actions">
+            <button
+              type="submit"
+              class="cc-btn"
+              data-cc-submit
+              data-cc-magnetic
+              data-label-add="{{ 'products.product.add_to_cart' | t | default: 'Add to cart' | escape }}"
+              data-label-sold-out="{{ 'products.product.sold_out' | t | default: 'Sold out' | escape }}"
+              {% unless current.available %}
+                disabled
+              {% endunless %}
+            >
+              <span data-cc-submit-label>
+                {%- if current.available -%}
+                  {{ 'products.product.add_to_cart' | t | default: 'Add to cart' }}
+                {%- else -%}
+                  {{ 'products.product.sold_out' | t | default: 'Sold out' }}
+                {%- endif -%}
+              </span>
+              <span class="cc-btn__arrow" aria-hidden="true">&rarr;</span>
+            </button>
+            <a class="cc-btn cc-btn--ghost" href="{{ p.url }}">{{ section.settings.details_label | escape }}</a>
+          </div>
+        {%- endform -%}
+
+        <script type="application/json" data-cc-variants>
+          [
+            {%- for v in p.variants -%}
+              {
+                "id": {{ v.id }},
+                "available": {{ v.available | json }},
+                "price": {{ v.price | money | json }},
+                "color": {% if color_key %}{{ v[color_key] | json }}{% else %}null{% endif %},
+                "size": {% if size_key %}{{ v[size_key] | json }}{% else %}null{% endif %}
+              }{% unless forloop.last %},{% endunless %}
+            {%- endfor -%}
+          ]
+        </script>
+      </div>
+    </div>
+  </section>
+{%- endif -%}
+
+{% stylesheet %}
+  .cc-showcase {
+    --cc-tint: transparent;
+    --cc-rx: 0deg;
+    --cc-ry: 0deg;
+    --cc-gx: 50%;
+    --cc-gy: 50%;
+    padding: clamp(64px, 9vw, 140px) clamp(20px, 4vw, 64px);
+  }
+
+  .cc-showcase__inner {
+    max-width: 1440px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: clamp(32px, 6vw, 110px);
+    align-items: center;
+  }
+
+  .cc-showcase__visual {
+    perspective: 1200px;
+  }
+
+  .cc-showcase__card {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    border-radius: 28px;
+    overflow: hidden;
+    background: #000;
+    border: 1px solid var(--cc-line);
+    transform: rotateX(var(--cc-rx)) rotateY(var(--cc-ry));
+    transform-style: preserve-3d;
+    transition: transform 0.6s var(--cc-ease);
+  }
+
+  .cc-showcase__tint {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(60% 55% at 50% 50%, var(--cc-tint), transparent 70%);
+    transition: background 1s var(--cc-ease);
+  }
+
+  .cc-showcase__shine {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    background: radial-gradient(40% 40% at var(--cc-gx) var(--cc-gy), rgba(255, 255, 255, 0.09), transparent 70%);
+    mix-blend-mode: screen;
+  }
+
+  .cc-showcase__slide {
+    position: absolute;
+    inset: 6%;
+    opacity: 0;
+    transform: scale(0.92) translateY(20px);
+    filter: blur(8px);
+    transition:
+      opacity 0.8s var(--cc-ease),
+      transform 1.1s var(--cc-ease),
+      filter 0.8s var(--cc-ease);
+  }
+
+  .cc-showcase__slide.is-active {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+
+  .cc-showcase__img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .cc-showcase__info {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  .cc-showcase__title {
+    margin: 0;
+    font-family: var(--cc-display);
+    font-weight: 800;
+    font-size: clamp(2.4rem, 5vw, 5rem);
+    line-height: 0.92;
+    letter-spacing: -0.045em;
+    text-transform: uppercase;
+  }
+
+  .cc-showcase__price {
+    margin: 0;
+    display: flex;
+    gap: 12px;
+    align-items: baseline;
+    font-size: 1.4rem;
+    font-weight: 500;
+  }
+
+  .cc-showcase__price s {
+    font-size: 1rem;
+    color: var(--cc-muted);
+  }
+
+  .cc-showcase__form {
+    display: flex;
+    flex-direction: column;
+    gap: 26px;
+  }
+
+  .cc-showcase__group {
+    border: 0;
+    margin: 0;
+    padding: 0;
+  }
+
+  .cc-showcase__group legend {
+    margin-bottom: 12px;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--cc-muted);
+  }
+
+  .cc-showcase__group legend strong {
+    color: var(--cc-fg);
+    font-weight: 500;
+  }
+
+  .cc-showcase__swatches,
+  .cc-showcase__sizes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .cc-swatch {
+    position: relative;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border-radius: 50%;
+    border: 1px solid var(--cc-line);
+    background: var(--cc-swatch);
+    cursor: pointer;
+    transition: transform 0.4s var(--cc-ease);
+  }
+
+  .cc-swatch::after {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    border: 1px solid var(--cc-fg);
+    opacity: 0;
+    transform: scale(0.8);
+    transition:
+      opacity 0.4s var(--cc-ease),
+      transform 0.4s var(--cc-ease);
+  }
+
+  .cc-swatch:hover {
+    transform: scale(1.08);
+  }
+
+  .cc-swatch.is-active::after {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .cc-size {
+    min-width: 58px;
+    padding: 14px 16px;
+    border-radius: 999px;
+    border: 1px solid var(--cc-line);
+    background: transparent;
+    color: var(--cc-fg);
+    font: inherit;
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    transition:
+      background 0.4s var(--cc-ease),
+      color 0.4s var(--cc-ease),
+      border-color 0.4s var(--cc-ease);
+  }
+
+  .cc-size:hover {
+    border-color: var(--cc-fg);
+  }
+
+  .cc-size.is-active {
+    background: var(--cc-fg);
+    color: var(--cc-bg);
+    border-color: var(--cc-fg);
+  }
+
+  .cc-size.is-unavailable {
+    color: var(--cc-muted);
+    text-decoration: line-through;
+  }
+
+  .cc-size.is-active.is-unavailable {
+    color: var(--cc-bg);
+  }
+
+  .cc-showcase__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  @media (max-width: 989px) {
+    .cc-showcase__inner {
+      grid-template-columns: 1fr;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Product spotlight",
+  "tag": "div",
+  "settings": [
+    {
+      "type": "product",
+      "id": "product",
+      "label": "Product"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Spotlight"
+    },
+    {
+      "type": "text",
+      "id": "details_label",
+      "label": "Details link label",
+      "default": "Full details"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product spotlight"
+    }
+  ]
+}
+{% endschema %}

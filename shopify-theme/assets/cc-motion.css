@@ -1,0 +1,367 @@
+/* ==========================================================================
+   cc-motion — custom animation layer for the Horizon theme
+   Every animation is opt-out for visitors with prefers-reduced-motion.
+   Content is only hidden for reveal when JS is running (html.cc-js),
+   and never inside the theme editor.
+   ========================================================================== */
+
+:root {
+  --cc-bg: #000;
+  --cc-fg: #f4f1ea;
+  --cc-muted: #8f8a82;
+  --cc-line: rgba(244, 241, 234, 0.12);
+  --cc-accent: #d8c6a5;
+  --cc-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --cc-ease-in-out: cubic-bezier(0.76, 0, 0.24, 1);
+  --cc-display: var(--font-heading--family, 'Inter', sans-serif);
+}
+
+::selection {
+  background: var(--cc-accent);
+  color: #000;
+}
+
+/* --------------------------------------------------------------------------
+   Scroll progress bar
+   -------------------------------------------------------------------------- */
+.cc-progress {
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 2px;
+  z-index: 1000;
+  pointer-events: none;
+  transform-origin: 0 50%;
+  transform: scaleX(var(--cc-progress, 0));
+  background: linear-gradient(90deg, var(--cc-accent), var(--cc-fg));
+}
+
+/* --------------------------------------------------------------------------
+   Intro curtain (home page, once per session)
+   -------------------------------------------------------------------------- */
+.cc-intro {
+  display: none;
+}
+
+html.cc-intro .cc-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: grid;
+  place-items: center;
+  background: var(--cc-bg);
+  color: var(--cc-fg);
+  pointer-events: none;
+  animation: cc-curtain 1s var(--cc-ease-in-out) 1.15s forwards;
+}
+
+.cc-intro__word {
+  display: block;
+  overflow: hidden;
+  font-family: var(--cc-display);
+  font-weight: 800;
+  font-size: clamp(2.5rem, 9vw, 7rem);
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.cc-intro__word span {
+  display: inline-block;
+  transform: translateY(110%);
+  animation: cc-rise 0.9s var(--cc-ease) 0.1s forwards;
+}
+
+.cc-intro__bar {
+  position: absolute;
+  left: 50%;
+  bottom: 18%;
+  width: min(220px, 50vw);
+  height: 1px;
+  transform: translateX(-50%);
+  background: var(--cc-line);
+  overflow: hidden;
+}
+
+.cc-intro__bar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--cc-fg);
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+  animation: cc-load 1s var(--cc-ease-in-out) 0.1s forwards;
+}
+
+@keyframes cc-curtain {
+  to {
+    clip-path: inset(0 0 100% 0);
+    visibility: hidden;
+  }
+}
+
+@keyframes cc-load {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes cc-rise {
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Scroll reveal
+   -------------------------------------------------------------------------- */
+html.cc-js:not(.shopify-design-mode) [data-cc-reveal] {
+  opacity: 0;
+  transform: translate3d(0, 48px, 0);
+  transition:
+    opacity 1s var(--cc-ease),
+    transform 1.1s var(--cc-ease);
+  transition-delay: calc(var(--cc-i, 0) * 90ms);
+}
+
+html.cc-js:not(.shopify-design-mode) [data-cc-reveal='fade'] {
+  transform: none;
+}
+
+html.cc-js:not(.shopify-design-mode) [data-cc-reveal='scale'] {
+  transform: scale(0.94);
+}
+
+html.cc-js:not(.shopify-design-mode) [data-cc-reveal].is-in {
+  opacity: 1;
+  transform: none;
+}
+
+/* Product cards from the theme's own grids */
+html.cc-js:not(.shopify-design-mode) .cc-card-reveal {
+  opacity: 0;
+  transform: translate3d(0, 60px, 0) scale(0.97);
+  transition:
+    opacity 0.9s var(--cc-ease),
+    transform 1.1s var(--cc-ease);
+  transition-delay: calc(var(--cc-i, 0) * 80ms);
+}
+
+html.cc-js:not(.shopify-design-mode) .cc-card-reveal.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+/* Image wipe-in on product cards */
+html.cc-js:not(.shopify-design-mode) .cc-card-reveal .card-gallery {
+  clip-path: inset(100% 0 0 0);
+  transition: clip-path 1.2s var(--cc-ease-in-out);
+  transition-delay: calc(var(--cc-i, 0) * 80ms + 100ms);
+}
+
+html.cc-js:not(.shopify-design-mode) .cc-card-reveal.is-in .card-gallery {
+  clip-path: inset(0 0 0 0);
+}
+
+/* --------------------------------------------------------------------------
+   Split text
+   -------------------------------------------------------------------------- */
+.cc-split-line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.06em;
+  margin-bottom: -0.06em;
+}
+
+.cc-split-word {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+html.cc-js:not(.shopify-design-mode) .cc-split-char {
+  display: inline-block;
+  transform: translate3d(0, 105%, 0) rotate(6deg);
+  opacity: 0;
+  transition:
+    transform 1.1s var(--cc-ease),
+    opacity 0.6s var(--cc-ease);
+  transition-delay: calc(var(--cc-delay, 0ms) + var(--cc-c, 0) * 28ms);
+}
+
+html.cc-js:not(.shopify-design-mode) .is-in .cc-split-char,
+html.cc-js:not(.shopify-design-mode) .is-in.cc-split-char {
+  transform: none;
+  opacity: 1;
+}
+
+/* --------------------------------------------------------------------------
+   Buttons
+   -------------------------------------------------------------------------- */
+.cc-btn {
+  --cc-btn-bg: var(--cc-fg);
+  --cc-btn-fg: var(--cc-bg);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75em;
+  padding: 1.05em 1.9em;
+  border-radius: 999px;
+  border: 1px solid var(--cc-btn-bg);
+  background: var(--cc-btn-bg);
+  color: var(--cc-btn-fg);
+  font-family: var(--cc-display);
+  font-weight: 600;
+  font-size: 0.8rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-decoration: none;
+  overflow: hidden;
+  isolation: isolate;
+  cursor: pointer;
+  transition:
+    color 0.5s var(--cc-ease),
+    transform 0.5s var(--cc-ease);
+  will-change: transform;
+}
+
+.cc-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--cc-accent);
+  transform: translateY(101%);
+  transition: transform 0.6s var(--cc-ease);
+}
+
+.cc-btn:hover::before,
+.cc-btn:focus-visible::before {
+  transform: translateY(0);
+}
+
+.cc-btn:hover,
+.cc-btn:focus-visible {
+  color: #000;
+}
+
+.cc-btn--ghost {
+  --cc-btn-bg: transparent;
+  --cc-btn-fg: var(--cc-fg);
+  border-color: var(--cc-line);
+}
+
+.cc-btn__arrow {
+  display: inline-block;
+  transition: transform 0.5s var(--cc-ease);
+}
+
+.cc-btn:hover .cc-btn__arrow {
+  transform: translateX(4px) rotate(-45deg);
+}
+
+.cc-btn[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* --------------------------------------------------------------------------
+   Shared section bits
+   -------------------------------------------------------------------------- */
+.cc-section {
+  position: relative;
+  background: var(--cc-bg);
+  color: var(--cc-fg);
+  overflow: hidden;
+}
+
+.cc-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75em;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--cc-muted);
+}
+
+.cc-eyebrow::before {
+  content: '';
+  width: 2.5em;
+  height: 1px;
+  background: currentColor;
+}
+
+.cc-grain::after {
+  content: '';
+  position: absolute;
+  inset: -50%;
+  pointer-events: none;
+  opacity: 0.07;
+  z-index: 3;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: cc-grain 1.2s steps(6) infinite;
+}
+
+@keyframes cc-grain {
+  0% { transform: translate(0, 0); }
+  20% { transform: translate(-3%, 2%); }
+  40% { transform: translate(2%, -4%); }
+  60% { transform: translate(-4%, -1%); }
+  80% { transform: translate(3%, 3%); }
+  100% { transform: translate(0, 0); }
+}
+
+/* Black-background product shots melt into the page */
+.cc-blend {
+  mix-blend-mode: screen;
+}
+
+/* --------------------------------------------------------------------------
+   Global polish on theme surfaces
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  .product-card .card-gallery img {
+    transition: transform 1.2s var(--cc-ease), filter 0.8s var(--cc-ease);
+  }
+
+  .product-card:hover .card-gallery img {
+    transform: scale(1.06);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Reduced motion: switch everything off
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  html.cc-intro .cc-intro {
+    display: none;
+  }
+
+  html.cc-js [data-cc-reveal],
+  html.cc-js .cc-card-reveal,
+  html.cc-js .cc-card-reveal .card-gallery,
+  html.cc-js .cc-split-char {
+    opacity: 1 !important;
+    transform: none !important;
+    clip-path: none !important;
+    transition: none !important;
+  }
+
+  .cc-grain::after,
+  .cc-progress {
+    animation: none;
+    display: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

@@ -1,0 +1,466 @@
+{%- liquid
+  assign hero_product = section.settings.product
+  assign intro_text = section.settings.intro_text | default: shop.name
+  assign color_option = hero_product.options_by_name['Color'] | default: hero_product.options_by_name['Colour']
+-%}
+
+{%- if template.name == 'index' -%}
+  <div class="cc-intro" aria-hidden="true">
+    <span class="cc-intro__word"><span>{{ intro_text | escape }}</span></span>
+    <span class="cc-intro__bar"></span>
+  </div>
+{%- endif -%}
+
+<section class="cc-section cc-hero cc-grain" data-cc-depth-scene>
+  <div class="cc-hero__glow" aria-hidden="true"></div>
+
+  <div class="cc-hero__ghost" aria-hidden="true">
+    <div class="cc-hero__ghost-track">
+      {%- for i in (1..4) -%}
+        <span>{{ section.settings.ghost_text | escape }}</span>
+      {%- endfor -%}
+    </div>
+  </div>
+
+  <div class="cc-hero__inner">
+    <div class="cc-hero__copy">
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="cc-eyebrow" data-cc-reveal style="--cc-i: 6">{{ section.settings.eyebrow | escape }}</p>
+      {%- endif -%}
+
+      <h1 class="cc-hero__title" data-cc-split style="--cc-delay: 300ms">
+        {{- section.settings.headline | escape | replace: '|', '<br>' -}}
+      </h1>
+
+      {%- if section.settings.subheading != blank -%}
+        <p class="cc-hero__sub" data-cc-reveal style="--cc-i: 8">{{ section.settings.subheading | escape }}</p>
+      {%- endif -%}
+
+      <div class="cc-hero__actions" data-cc-reveal style="--cc-i: 9">
+        {%- if section.settings.button_label != blank -%}
+          <a
+            class="cc-btn"
+            data-cc-magnetic
+            href="{{ section.settings.button_link | default: hero_product.url | default: routes.all_products_collection_url }}"
+          >
+            {{ section.settings.button_label | escape }}
+            <span class="cc-btn__arrow" aria-hidden="true">&rarr;</span>
+          </a>
+        {%- endif -%}
+        {%- if section.settings.button_2_label != blank -%}
+          <a
+            class="cc-btn cc-btn--ghost"
+            data-cc-magnetic
+            href="{{ section.settings.button_2_link | default: routes.all_products_collection_url }}"
+          >
+            {{- section.settings.button_2_label | escape -}}
+          </a>
+        {%- endif -%}
+      </div>
+    </div>
+
+    <div class="cc-hero__stage" aria-hidden="true">
+      {%- if hero_product != blank and color_option != blank -%}
+        {%- for value in color_option.values -%}
+          {%- liquid
+            assign vname = value | append: ''
+            assign opt_key = 'option' | append: color_option.position
+            assign v = hero_product.variants | where: opt_key, vname | first
+            assign img = v.featured_media | default: hero_product.featured_media
+          -%}
+          {%- if img != blank -%}
+            <div class="cc-hero__piece" style="--cc-n: {{ forloop.index0 }}; --cc-count: {{ forloop.length }}">
+              <div class="cc-hero__float">
+                {{
+                  img
+                  | image_url: width: 1100
+                  | image_tag:
+                    class: 'cc-hero__img cc-blend',
+                    loading: 'eager',
+                    fetchpriority: 'high',
+                    sizes: '(min-width: 990px) 34vw, 70vw',
+                    widths: '400, 600, 800, 1100',
+                    alt: ''
+                }}
+              </div>
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+      {%- elsif hero_product.featured_media != blank -%}
+        <div class="cc-hero__piece" style="--cc-n: 0; --cc-count: 1">
+          <div class="cc-hero__float">
+            {{
+              hero_product.featured_media
+              | image_url: width: 1100
+              | image_tag: class: 'cc-hero__img cc-blend', loading: 'eager', alt: ''
+            }}
+          </div>
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+
+  <div class="cc-hero__scroll" aria-hidden="true">
+    <span>{{ section.settings.scroll_label | escape }}</span>
+    <i></i>
+  </div>
+</section>
+
+{% stylesheet %}
+  .cc-hero {
+    --cc-mx: 0;
+    --cc-my: 0;
+    --cc-gx: 70%;
+    --cc-gy: 40%;
+    min-height: calc(100svh - var(--header-group-height, 110px));
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: clamp(32px, 5vw, 72px) 0 96px;
+  }
+
+  .cc-hero__glow {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background:
+      radial-gradient(42vmax 42vmax at var(--cc-gx) var(--cc-gy), rgba(216, 198, 165, 0.16), transparent 60%),
+      radial-gradient(60vmax 50vmax at 85% 110%, rgba(255, 255, 255, 0.06), transparent 60%);
+    transition: background-position 0.6s ease;
+  }
+
+  .cc-hero__ghost {
+    position: absolute;
+    inset: auto 0 6% 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+    opacity: 0.9;
+  }
+
+  .cc-hero__ghost-track {
+    display: flex;
+    width: max-content;
+    animation: cc-hero-ghost 38s linear infinite;
+  }
+
+  .cc-hero__ghost span {
+    padding-right: 0.3em;
+    font-family: var(--cc-display);
+    font-weight: 900;
+    font-size: clamp(6rem, 22vw, 22rem);
+    line-height: 0.8;
+    letter-spacing: -0.05em;
+    text-transform: uppercase;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(244, 241, 234, 0.09);
+    white-space: nowrap;
+  }
+
+  @keyframes cc-hero-ghost {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  .cc-hero__inner {
+    position: relative;
+    z-index: 2;
+    width: min(1440px, 100%);
+    margin: 0 auto;
+    padding: 0 clamp(20px, 4vw, 64px);
+    display: grid;
+    grid-template-columns: 1.05fr 1fr;
+    align-items: center;
+    gap: clamp(24px, 4vw, 80px);
+  }
+
+  .cc-hero__copy {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  .cc-hero__title {
+    margin: 0;
+    font-family: var(--cc-display);
+    font-weight: 800;
+    font-size: clamp(3.2rem, 8.6vw, 9.5rem);
+    line-height: 0.88;
+    letter-spacing: -0.055em;
+    text-transform: uppercase;
+    color: var(--cc-fg);
+  }
+
+  .cc-hero__title .cc-split-line:last-child {
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--cc-fg);
+  }
+
+  .cc-hero__sub {
+    margin: 0;
+    max-width: 42ch;
+    font-size: clamp(1rem, 1.2vw, 1.15rem);
+    line-height: 1.6;
+    color: var(--cc-muted);
+  }
+
+  .cc-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 6px;
+  }
+
+  /* Fanned product stack */
+  .cc-hero__stage {
+    position: relative;
+    aspect-ratio: 1 / 1.05;
+    perspective: 1400px;
+  }
+
+  .cc-hero__piece {
+    --cc-off: calc(var(--cc-n) - (var(--cc-count) - 1) / 2);
+    --cc-depth: calc(18px + var(--cc-n) * 14px);
+    position: absolute;
+    inset: 8% 10%;
+    transform:
+      translate3d(
+        calc(var(--cc-off) * 26% + var(--cc-mx) * var(--cc-depth) * -2),
+        calc(var(--cc-my) * var(--cc-depth) * -2),
+        0
+      )
+      rotate(calc(var(--cc-off) * 9deg))
+      scale(0.86);
+    z-index: calc(10 - var(--cc-n));
+    transition: transform 1.1s var(--cc-ease);
+  }
+
+  .cc-hero__piece:nth-child(2) {
+    z-index: 11;
+  }
+
+  .cc-hero__stage:hover .cc-hero__piece {
+    transform:
+      translate3d(
+        calc(var(--cc-off) * 38% + var(--cc-mx) * var(--cc-depth) * -2),
+        calc(var(--cc-my) * var(--cc-depth) * -2 - 2%),
+        0
+      )
+      rotate(calc(var(--cc-off) * 14deg))
+      scale(0.9);
+  }
+
+  .cc-hero__float {
+    width: 100%;
+    height: 100%;
+    animation: cc-hero-float 6s ease-in-out infinite;
+    animation-delay: calc(var(--cc-n) * -1.7s);
+  }
+
+  @keyframes cc-hero-float {
+    0%,
+    100% {
+      transform: translateY(0) rotate(0deg);
+    }
+    50% {
+      transform: translateY(-14px) rotate(1.2deg);
+    }
+  }
+
+  .cc-hero__img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    filter: drop-shadow(0 40px 60px rgba(0, 0, 0, 0.6));
+  }
+
+  /* Entrance for the stack */
+  html.cc-js:not(.shopify-design-mode) .cc-hero__float {
+    opacity: 0;
+    translate: 0 80px;
+    transition:
+      opacity 1.2s var(--cc-ease),
+      translate 1.4s var(--cc-ease);
+    transition-delay: calc(500ms + var(--cc-n) * 140ms);
+  }
+
+  html.cc-intro:not(.shopify-design-mode) .cc-hero__float {
+    transition-delay: calc(1.6s + var(--cc-n) * 140ms);
+  }
+
+  html.cc-intro:not(.shopify-design-mode) .cc-hero .cc-split-char {
+    --cc-delay: 1450ms;
+  }
+
+  html.cc-intro:not(.shopify-design-mode) .cc-hero [data-cc-reveal] {
+    transition-delay: calc(1.4s + var(--cc-i, 0) * 90ms);
+  }
+
+  html.cc-js.cc-ready .cc-hero__float,
+  html.cc-js .cc-hero.is-loaded .cc-hero__float {
+    opacity: 1;
+    translate: 0 0;
+  }
+
+  .cc-hero__scroll {
+    position: absolute;
+    left: 50%;
+    bottom: 26px;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    transform: translateX(-50%);
+    font-size: 0.65rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--cc-muted);
+  }
+
+  .cc-hero__scroll i {
+    position: relative;
+    width: 1px;
+    height: 44px;
+    overflow: hidden;
+    background: var(--cc-line);
+  }
+
+  .cc-hero__scroll i::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--cc-fg);
+    animation: cc-hero-scroll 2s var(--cc-ease-in-out) infinite;
+  }
+
+  @keyframes cc-hero-scroll {
+    0% {
+      transform: translateY(-100%);
+    }
+    100% {
+      transform: translateY(100%);
+    }
+  }
+
+  @media (max-width: 989px) {
+    .cc-hero {
+      padding-top: 16px;
+    }
+
+    .cc-hero__inner {
+      grid-template-columns: 1fr;
+    }
+
+    .cc-hero__stage {
+      order: -1;
+      width: min(520px, 92%);
+      margin: 0 auto;
+      aspect-ratio: 1 / 0.8;
+    }
+
+    .cc-hero__copy {
+      align-items: flex-start;
+    }
+
+    .cc-hero__scroll {
+      display: none;
+    }
+  }
+{% endstylesheet %}
+
+<script>
+  (function () {
+    var s = document.currentScript.previousElementSibling;
+    while (s && !s.classList.contains('cc-hero')) s = s.previousElementSibling;
+    if (!s) return;
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        s.classList.add('is-loaded');
+      });
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Animated hero",
+  "tag": "div",
+  "class": "cc-hero-section",
+  "settings": [
+    {
+      "type": "product",
+      "id": "product",
+      "label": "Product to feature",
+      "info": "Shows one image per colour, fanned out."
+    },
+    {
+      "type": "text",
+      "id": "intro_text",
+      "label": "Intro screen text",
+      "info": "Shown once per visit on the home page. Defaults to the store name."
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "New drop"
+    },
+    {
+      "type": "text",
+      "id": "headline",
+      "label": "Headline",
+      "info": "Use | for a line break. The last line is drawn as an outline.",
+      "default": "Comfort|Elevated"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Oversized hoodies in three colourways. Built to be worn every day."
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Primary button",
+      "default": "Shop the drop"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Primary button link",
+      "info": "Defaults to the featured product."
+    },
+    {
+      "type": "text",
+      "id": "button_2_label",
+      "label": "Secondary button",
+      "default": "View all"
+    },
+    {
+      "type": "url",
+      "id": "button_2_link",
+      "label": "Secondary button link"
+    },
+    {
+      "type": "text",
+      "id": "ghost_text",
+      "label": "Background scrolling word",
+      "default": "Oversized"
+    },
+    {
+      "type": "text",
+      "id": "scroll_label",
+      "label": "Scroll hint",
+      "default": "Scroll"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Animated hero"
+    }
+  ]
+}
+{% endschema %}

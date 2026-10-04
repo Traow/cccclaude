@@ -1,0 +1,132 @@
+<section class="cc-section cc-features">
+  <div class="cc-features__grid">
+    {%- for block in section.blocks -%}
+      <div class="cc-feature__wrap" data-cc-reveal style="--cc-i: {{ forloop.index0 }}" {{ block.shopify_attributes }}>
+      <div class="cc-feature" data-cc-tilt>
+        <span class="cc-feature__glow" aria-hidden="true"></span>
+        <span class="cc-feature__num" aria-hidden="true">0{{ forloop.index }}</span>
+        <h3 class="cc-feature__title">{{ block.settings.title | escape }}</h3>
+        <p class="cc-feature__text">{{ block.settings.text | escape }}</p>
+      </div>
+      </div>
+    {%- endfor -%}
+  </div>
+</section>
+
+{% stylesheet %}
+  .cc-features {
+    padding: clamp(48px, 7vw, 110px) clamp(20px, 4vw, 64px);
+  }
+
+  .cc-features__grid {
+    max-width: 1440px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 14px;
+  }
+
+  .cc-feature__wrap {
+    display: flex;
+  }
+
+  .cc-feature {
+    flex: 1;
+    --cc-rx: 0deg;
+    --cc-ry: 0deg;
+    --cc-gx: 50%;
+    --cc-gy: 0%;
+    position: relative;
+    min-height: 260px;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 12px;
+    border-radius: 22px;
+    border: 1px solid var(--cc-line);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0));
+    overflow: hidden;
+    transform: perspective(900px) rotateX(var(--cc-rx)) rotateY(var(--cc-ry));
+    transition:
+      border-color 0.5s var(--cc-ease),
+      opacity 1s var(--cc-ease),
+      transform 0.6s var(--cc-ease);
+  }
+
+  .cc-feature:hover {
+    border-color: rgba(216, 198, 165, 0.45);
+  }
+
+  .cc-feature__glow {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(50% 60% at var(--cc-gx) var(--cc-gy), rgba(216, 198, 165, 0.18), transparent 70%);
+    opacity: 0;
+    transition: opacity 0.5s var(--cc-ease);
+  }
+
+  .cc-feature:hover .cc-feature__glow {
+    opacity: 1;
+  }
+
+  .cc-feature__num {
+    position: absolute;
+    top: 22px;
+    right: 26px;
+    font-family: var(--cc-display);
+    font-weight: 800;
+    font-size: 4.2rem;
+    line-height: 1;
+    letter-spacing: -0.05em;
+    color: transparent;
+    -webkit-text-stroke: 1px var(--cc-line);
+    transition: -webkit-text-stroke-color 0.5s var(--cc-ease);
+  }
+
+  .cc-feature:hover .cc-feature__num {
+    -webkit-text-stroke-color: var(--cc-accent);
+  }
+
+  .cc-feature__title {
+    position: relative;
+    margin: 0;
+    font-family: var(--cc-display);
+    font-weight: 700;
+    font-size: 1.35rem;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+  }
+
+  .cc-feature__text {
+    position: relative;
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--cc-muted);
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Feature cards",
+  "tag": "div",
+  "max_blocks": 6,
+  "blocks": [
+    {
+      "type": "feature",
+      "name": "Feature",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Title", "default": "Feature" },
+        { "type": "textarea", "id": "text", "label": "Text", "default": "Describe it in a sentence." }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Feature cards",
+      "blocks": [{ "type": "feature" }, { "type": "feature" }, { "type": "feature" }]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,247 @@
+{%- liquid
+  assign p = section.settings.product
+  assign color_option = p.options_by_name['Color'] | default: p.options_by_name['Colour']
+-%}
+
+<section class="cc-section cc-colorways">
+  <div class="cc-colorways__head">
+    <p class="cc-eyebrow" data-cc-reveal>{{ section.settings.eyebrow | escape }}</p>
+    <h2 class="cc-colorways__title" data-cc-split>{{ section.settings.heading | escape | replace: '|', '<br>' }}</h2>
+  </div>
+
+  {%- if p != blank and color_option != blank -%}
+    <div class="cc-colorways__panels" data-cc-colorways data-cc-reveal="scale">
+      {%- assign opt_key = 'option' | append: color_option.position -%}
+      {%- for value in color_option.values -%}
+        {%- liquid
+          assign vname = value | append: ''
+          assign v = p.variants | where: opt_key, vname | first
+          assign img = v.featured_media | default: p.featured_media
+          assign key = vname | downcase
+          case key
+            when 'black'
+              assign tint = '#1d1d1d'
+            when 'light gray', 'light grey', 'grey', 'gray'
+              assign tint = '#8d8d8a'
+            when 'beige', 'sand', 'taupe'
+              assign tint = '#a8977d'
+            else
+              assign tint = '#444'
+          endcase
+        -%}
+        <a
+          class="cc-colorways__panel{% if forloop.first %} is-open{% endif %}"
+          href="{{ v.url | default: p.url }}"
+          data-cc-panel
+          style="--cc-tint: {{ tint }}; --cc-n: {{ forloop.index0 }}"
+        >
+          <span class="cc-colorways__bg" aria-hidden="true"></span>
+          {%- if img != blank -%}
+            {{
+              img
+              | image_url: width: 1200
+              | image_tag:
+                class: 'cc-colorways__img cc-blend',
+                loading: 'lazy',
+                sizes: '(min-width: 990px) 60vw, 100vw',
+                widths: '500, 800, 1200',
+                alt: vname
+            }}
+          {%- endif -%}
+          <span class="cc-colorways__index" aria-hidden="true">0{{ forloop.index }}</span>
+          <span class="cc-colorways__name">{{ vname }}</span>
+          <span class="cc-colorways__cta">
+            {{ section.settings.cta_label | escape }} <span aria-hidden="true">&rarr;</span>
+          </span>
+        </a>
+      {%- endfor -%}
+    </div>
+  {%- endif -%}
+</section>
+
+{% stylesheet %}
+  .cc-colorways {
+    padding: clamp(64px, 9vw, 140px) clamp(20px, 4vw, 64px);
+  }
+
+  .cc-colorways__head {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    max-width: 1440px;
+    margin: 0 auto clamp(32px, 4vw, 56px);
+  }
+
+  .cc-colorways__title {
+    margin: 0;
+    font-family: var(--cc-display);
+    font-weight: 800;
+    font-size: clamp(2.6rem, 6.5vw, 6.5rem);
+    line-height: 0.9;
+    letter-spacing: -0.05em;
+    text-transform: uppercase;
+  }
+
+  .cc-colorways__panels {
+    display: flex;
+    gap: 10px;
+    max-width: 1440px;
+    height: clamp(420px, 70vh, 720px);
+    margin: 0 auto;
+  }
+
+  .cc-colorways__panel {
+    position: relative;
+    flex: 1 1 0;
+    min-width: 0;
+    border-radius: 18px;
+    overflow: hidden;
+    color: var(--cc-fg);
+    text-decoration: none;
+    isolation: isolate;
+    transition: flex-grow 0.9s var(--cc-ease);
+  }
+
+  .cc-colorways__panel.is-open {
+    flex-grow: 3.2;
+  }
+
+  .cc-colorways__bg {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(80% 70% at 50% 45%, var(--cc-tint), transparent 75%),
+      #000;
+    opacity: 0.55;
+    transition: opacity 0.9s var(--cc-ease);
+  }
+
+  .cc-colorways__panel.is-open .cc-colorways__bg {
+    opacity: 1;
+  }
+
+  .cc-colorways__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transform: scale(1.45);
+    filter: grayscale(0.4) brightness(0.7);
+    transition:
+      transform 1.4s var(--cc-ease),
+      filter 0.9s var(--cc-ease);
+  }
+
+  .cc-colorways__panel.is-open .cc-colorways__img {
+    transform: scale(0.92) translateY(-3%);
+    filter: none;
+  }
+
+  .cc-colorways__index {
+    position: absolute;
+    top: 22px;
+    left: 24px;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    color: var(--cc-muted);
+  }
+
+  .cc-colorways__name {
+    position: absolute;
+    left: 24px;
+    bottom: 22px;
+    font-family: var(--cc-display);
+    font-weight: 800;
+    font-size: clamp(1.4rem, 2.6vw, 2.6rem);
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    transform-origin: 0 100%;
+    transition: transform 0.9s var(--cc-ease);
+  }
+
+  .cc-colorways__panel:not(.is-open) .cc-colorways__name {
+    transform: translate(0.9em, -0.2em) rotate(-90deg) translateX(0);
+  }
+
+  .cc-colorways__cta {
+    position: absolute;
+    right: 24px;
+    bottom: 26px;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    opacity: 0;
+    transform: translateY(12px);
+    transition:
+      opacity 0.6s var(--cc-ease),
+      transform 0.6s var(--cc-ease);
+  }
+
+  .cc-colorways__panel.is-open .cc-colorways__cta {
+    opacity: 1;
+    transform: none;
+    transition-delay: 0.3s;
+  }
+
+  @media (max-width: 749px) {
+    .cc-colorways__panels {
+      flex-direction: column;
+      height: auto;
+    }
+
+    .cc-colorways__panel {
+      flex: none;
+      height: 110px;
+      transition: height 0.9s var(--cc-ease);
+    }
+
+    .cc-colorways__panel.is-open {
+      height: 420px;
+    }
+
+    .cc-colorways__panel:not(.is-open) .cc-colorways__name {
+      transform: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Colourway panels",
+  "tag": "div",
+  "settings": [
+    {
+      "type": "product",
+      "id": "product",
+      "label": "Product"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Pick your colour"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "info": "Use | for a line break.",
+      "default": "Three ways|to wear it"
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Link label",
+      "default": "Shop"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Colourway panels"
+    }
+  ]
+}
+{% endschema %}

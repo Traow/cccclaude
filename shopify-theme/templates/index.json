@@ -1,0 +1,284 @@
+{
+  "sections": {
+    "cc_hero": {
+      "type": "cc-hero",
+      "settings": {
+        "product": "hall-oversized-hoodie-naidistoode",
+        "intro_text": "",
+        "eyebrow": "New drop",
+        "headline": "Comfort|Elevated",
+        "subheading": "Oversized hoodies in Light Gray, Black and Beige. Built to be worn every day.",
+        "button_label": "Shop the drop",
+        "button_link": "",
+        "button_2_label": "View all",
+        "button_2_link": "shopify://collections/all",
+        "ghost_text": "Oversized",
+        "scroll_label": "Scroll"
+      }
+    },
+    "cc_marquee": {
+      "type": "cc-marquee",
+      "settings": {
+        "items": "New drop|Oversized fit|Three colourways|Limited run",
+        "style": "line",
+        "speed": 34,
+        "tilt": 0,
+        "reverse": false
+      }
+    },
+    "cc_showcase": {
+      "type": "cc-showcase",
+      "settings": {
+        "product": "hall-oversized-hoodie-naidistoode",
+        "eyebrow": "Spotlight",
+        "details_label": "Full details"
+      }
+    },
+    "product_list_fa6P9H": {
+      "type": "product-list",
+      "blocks": {
+        "static-header": {
+          "type": "_product-list-content",
+          "name": "t:names.header",
+          "static": true,
+          "settings": {
+            "content_direction": "row",
+            "vertical_on_mobile": false,
+            "horizontal_alignment": "space-between",
+            "vertical_alignment": "flex-end",
+            "align_baseline": true,
+            "horizontal_alignment_flex_direction_column": "flex-start",
+            "vertical_alignment_flex_direction_column": "center",
+            "gap": 12,
+            "width": "fill",
+            "custom_width": 100,
+            "width_mobile": "fill",
+            "custom_width_mobile": 100,
+            "height": "fit",
+            "custom_height": 100,
+            "background_media": "none",
+            "video_position": "cover",
+            "background_image_position": "cover",
+            "border": "none",
+            "border_width": 1,
+            "border_opacity": 100,
+            "border_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {
+            "product_list_text_YFtzcL": {
+              "type": "_product-list-text",
+              "name": "t:names.collection_title",
+              "settings": {
+                "text": "<h2>The collection</h2>",
+                "width": "fit-content",
+                "max_width": "normal",
+                "alignment": "left",
+                "type_preset": "h2",
+                "font": "var(--font-heading--family)",
+                "line_height": "tight",
+                "letter_spacing": "tight",
+                "case": "uppercase",
+                "wrap": "pretty",
+                "background": false,
+                "background_color": "#00000026",
+                "corner_radius": 0,
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
+            "product_list_button_MWeP9V": {
+              "type": "_product-list-button",
+              "name": "t:names.product_list_button",
+              "settings": {
+                "label": "View all",
+                "open_in_new_tab": false,
+                "style_class": "link",
+                "width": "fit-content",
+                "custom_width": 100,
+                "width_mobile": "fit-content",
+                "custom_width_mobile": 100
+              },
+              "blocks": {}
+            }
+          },
+          "block_order": [
+            "product_list_text_YFtzcL",
+            "product_list_button_MWeP9V"
+          ]
+        },
+        "static-product-card": {
+          "type": "_product-card",
+          "name": "t:names.product_card",
+          "static": true,
+          "settings": {
+            "product_card_gap": 8,
+            "border": "none",
+            "border_width": 1,
+            "border_opacity": 100,
+            "border_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          },
+          "blocks": {
+            "product_card_gallery_677WP3": {
+              "type": "_product-card-gallery",
+              "name": "t:names.product_card_media",
+              "settings": {
+                "image_ratio": "square",
+                "border": "none",
+                "border_width": 1,
+                "border_opacity": 100,
+                "border_radius": 16,
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
+            "product_title_YXxMTj": {
+              "type": "product-title",
+              "name": "t:names.product_title",
+              "settings": {
+                "width": "100%",
+                "max_width": "normal",
+                "alignment": "left",
+                "type_preset": "rte",
+                "font": "var(--font-body--family)",
+                "font_size": "1rem",
+                "line_height": "normal",
+                "letter_spacing": "normal",
+                "case": "uppercase",
+                "wrap": "pretty",
+                "background": false,
+                "background_color": "#00000026",
+                "corner_radius": 0,
+                "padding-block-start": 8,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
+            "price_JQzVV4": {
+              "type": "price",
+              "name": "t:names.product_price",
+              "settings": {
+                "show_sale_price_first": true,
+                "show_installments": false,
+                "show_tax_info": false,
+                "type_preset": "h6",
+                "width": "100%",
+                "alignment": "left",
+                "font": "var(--font-body--family)",
+                "font_size": "1rem",
+                "line_height": "normal",
+                "letter_spacing": "normal",
+                "case": "none",
+                "padding-block-start": 0,
+                "padding-block-end": 0,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            }
+          },
+          "block_order": [
+            "product_card_gallery_677WP3",
+            "product_title_YXxMTj",
+            "price_JQzVV4"
+          ]
+        }
+      },
+      "name": "t:names.product_list",
+      "settings": {
+        "collection": "all",
+        "layout_type": "grid",
+        "carousel_on_mobile": false,
+        "max_products": 8,
+        "columns": 4,
+        "mobile_columns": "2",
+        "mobile_card_size": "60cqw",
+        "columns_gap": 12,
+        "rows_gap": 36,
+        "icons_style": "arrow",
+        "icons_shape": "none",
+        "section_width": "page-width",
+        "horizontal_alignment": "flex-start",
+        "gap": 40,
+        "background_color": "{{ settings.color_palette.background }}",
+        "padding-block-start": 96,
+        "padding-block-end": 96
+      }
+    },
+    "cc_colorways": {
+      "type": "cc-colorways",
+      "settings": {
+        "product": "hall-oversized-hoodie-naidistoode",
+        "eyebrow": "Pick your colour",
+        "heading": "Three ways|to wear it",
+        "cta_label": "Shop"
+      }
+    },
+    "cc_marquee_2": {
+      "type": "cc-marquee",
+      "settings": {
+        "items": "Light Gray|Black|Beige|Oversized",
+        "style": "solid",
+        "speed": 28,
+        "tilt": -2,
+        "reverse": true
+      }
+    },
+    "cc_features": {
+      "type": "cc-features",
+      "blocks": {
+        "f1": {
+          "type": "feature",
+          "settings": {
+            "title": "Oversized fit",
+            "text": "Dropped shoulders and a relaxed body for that easy, layered silhouette."
+          }
+        },
+        "f2": {
+          "type": "feature",
+          "settings": {
+            "title": "Three colourways",
+            "text": "Light Gray, Black and Beige. Pick one, or build the set."
+          }
+        },
+        "f3": {
+          "type": "feature",
+          "settings": {
+            "title": "Secure checkout",
+            "text": "Pay safely with the methods you already use."
+          }
+        }
+      },
+      "block_order": [
+        "f1",
+        "f2",
+        "f3"
+      ],
+      "settings": {}
+    }
+  },
+  "order": [
+    "cc_hero",
+    "cc_marquee",
+    "cc_showcase",
+    "product_list_fa6P9H",
+    "cc_colorways",
+    "cc_marquee_2",
+    "cc_features"
+  ]
+}
