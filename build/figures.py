@@ -166,7 +166,7 @@ def tree(c, rows, links, colors):
 
 
 def problem_tree():
-    c = Canvas("Probleemipuu", 16.0, 11.6)
+    c = Canvas("Probleemipuu", 16.0, 11.8)
     colors = {
         "eff": (EFF2, EFF_L, False, 10, None),
         "core": (CORE, CORE_L, True, 11, None),
@@ -177,47 +177,41 @@ def problem_tree():
     R = [1.35, 4.05, 6.65, 9.35, 11.95, 14.65]
     rows = [
         (0.0, 1.45, [
-            ("T4", 4.50, 6.2, "T4. Ettevõtete aastatulu ja investeerimisvõime on madal, oskustöötajad lahkuvad", "eff"),
-            ("T5", 11.50, 6.2, "T5. Pärnu konkurentsivõime aastaringse kuurortlinna ja elukeskkonnana nõrgeneb", "eff"),
+            ("T4", 4.50, 6.2, "T4. Merchandise'i ja piletimüügi potentsiaal jääb osaliselt kasutamata", "eff"),
+            ("T5", 11.50, 6.2, "T5. Klubi maine ja brändi väärtus kahanevad pikas plaanis", "eff"),
         ]),
         (2.10, 1.50, [
-            ("T1", L[0], 4.7, "T1. Majutuse täituvus nov–märts on 39–50% (suvel 60–80%)", "eff"),
-            ("T2", L[1], 4.7, "T2. Paljud ettevõtted sulgevad talveks, töö on hooajaline", "eff"),
-            ("T3", L[2], 4.7, "T3. Linnaruum ja taristu on väljaspool hooaega alakasutatud", "eff"),
+            ("T1", L[0], 4.7, "T1. Traditsioonilised fännid kritiseerivad brändi ega samastu sellega", "eff"),
+            ("T2", L[1], 4.7, "T2. Fännibaas jaguneb „vanaks“ ja „uueks“ kogukonnaks", "eff"),
+            ("T3", L[2], 4.7, "T3. Emotsionaalne side ja lojaalsus klubiga nõrgenevad", "eff"),
         ]),
-        (4.40, 1.10, [
-            ("CORE", 8.0, 12.0, "PÕHIPROBLEEM: Pärnu külastatavus ja turismitulu langevad madalhooajal (oktoober–aprill) järsult", "core"),
+        (4.40, 1.30, [
+            ("CORE", 8.0, 12.6, "PÕHIPROBLEEM: 2017. aasta rebrändingu järel on Juventuse fännibaas killustunud ega samastu ühtse identiteediga", "core"),
         ]),
-        (6.30, 1.50, [
-            ("P1", L[0], 4.7, "P1. Ilmast sõltumatuid aastaringseid atraktsioone ja sündmusi on vähe", "cause"),
-            ("P2", L[1], 4.7, "P2. Sihtkoha turundus ja tootepaketid keskenduvad suvele", "cause"),
-            ("P3", L[2], 4.7, "P3. Madalhooajal on ligipääs ja teenuste kättesaadavus piiratud", "cause"),
+        (6.50, 1.50, [
+            ("P1", L[0], 4.7, "P1. Uus identiteet katkestas sideme klubi ajaloo ja sümboolikaga", "cause"),
+            ("P2", L[1], 4.7, "P2. Fänne ei kaasatud rebrändingu protsessi", "cause"),
+            ("P3", L[2], 4.7, "P3. Brändistrateegia eelistab globaalset ärilist sihtrühma", "cause"),
         ]),
-        (8.60, 2.10, [
-            ("P1a", R[0], 2.5, "P1a. Investeeringud on suunatud suvisele rannataristule", "root"),
-            ("P1b", R[1], 2.5, "P1b. Sündmusi ei kavandata ühiselt", "root"),
-            ("P2a", R[2], 2.5, "P2a. Puudub ühine madalhooaja bränd ja tootepaketid", "root"),
-            ("P2b", R[3], 2.5, "P2b. Turundusraha on osapoolte vahel killustatud", "root"),
-            ("P3a", R[4], 2.5, "P3a. Ühistransport on talvel harv, lennuühendus puudub", "root"),
-            ("P3b", R[5], 2.5, "P3b. Väike nõudlus → lühemad lahtiolekuajad (nõiaring)", "root"),
+        (8.80, 2.10, [
+            ("P1a", R[0], 2.5, "P1a. Ovaalne vapp ja Torino härg kadusid", "root"),
+            ("P1b", R[1], 2.5, "P1b. „J“-logo tundub fännidele korporatiivne", "root"),
+            ("P2a", R[2], 2.5, "P2a. Muudatus esitleti valmis lahendusena", "root"),
+            ("P2b", R[3], 2.5, "P2b. Puudub fännide alaline tagasiside­kanal", "root"),
+            ("P3a", R[4], 2.5, "P3a. Fookus elustiili- ja moe­toodetel", "root"),
+            ("P3b", R[5], 2.5, "P3b. Sõnumid ei väärtusta klubi pärandit", "root"),
         ]),
     ]
-    links = [
-        ("P1a", "P1"), ("P1b", "P1"), ("P2a", "P2"), ("P2b", "P2"), ("P3a", "P3"), ("P3b", "P3"),
-        ("P1", "CORE"), ("P2", "CORE"), ("P3", "CORE"),
-        ("T1", "CORE") if False else None,
-    ]
-    links = [l for l in links if l]
+    links = [("P1a", "P1"), ("P1b", "P1"), ("P2a", "P2"), ("P2b", "P2"), ("P3a", "P3"), ("P3b", "P3"),
+             ("P1", "CORE"), ("P2", "CORE"), ("P3", "CORE")]
     tree(c, rows, links, colors)
-    # tagajärjed: põhiprobleem -> T1..T3 -> T4/T5 (nool osutab põhjuselt tagajärjele)
     for t in ("T1", "T2", "T3"):
         c.connect_up("CORE", t)
     c.connect_up("T1", "T4")
     c.connect_up("T2", "T4")
     c.connect_up("T2", "T5")
     c.connect_up("T3", "T5")
-    # rea sildid paremas servas puuduvad – legend joonise all
-    c.label("lg", 8.0, 11.0, 16.0, 0.5,
+    c.label("lg", 8.0, 11.2, 16.0, 0.5,
             "Oranž – tagajärjed; punakas – põhiprobleem; sinine – otsesed põhjused; hall – algpõhjused. Nool: põhjus → tagajärg.",
             size=9, color="404040")
     return c
@@ -227,7 +221,7 @@ def problem_tree():
 # Joonis 2 – eesmärgipuu
 # ---------------------------------------------------------------------------
 def objective_tree():
-    c = Canvas("Eesmärgipuu", 16.0, 12.0)
+    c = Canvas("Eesmärgipuu", 16.0, 12.2)
     IN, IN_L = "E2EFDA", "548235"
     CORE_G, CORE_GL = "A9D18E", "385723"
     OUT, OUT_L = "FFFFFF", "7F7F7F"
@@ -241,29 +235,29 @@ def objective_tree():
     R = [1.35, 4.05, 6.65, 9.35, 11.95, 14.65]
     rows = [
         (0.0, 1.45, [
-            ("E4", 4.50, 6.2, "E4. Ettevõtete aastatulu ja investeerimisvõime kasvavad, töökohad on püsivad", "end"),
-            ("E5", 11.50, 6.2, "E5. Pärnu on konkurentsivõimeline aastaringne kuurortlinn ja elukeskkond", "end"),
+            ("E4", 4.50, 6.2, "E4. Merchandise'i ja piletimüügi potentsiaal on täielikult kasutatud", "end"),
+            ("E5", 11.50, 6.2, "E5. Klubi maine ja brändi väärtus kasvavad", "end"),
         ]),
         (2.10, 1.50, [
-            ("E1", L[0], 4.7, "E1. Majutuse täituvus nov–märts on vähemalt 55%", "end"),
-            ("E2", L[1], 4.7, "E2. Ettevõtted tegutsevad aastaringselt, töö ei ole hooajaline", "end"),
-            ("E3", L[2], 4.7, "E3. Linnaruum ja taristu on aastaringselt kasutuses", "end"),
+            ("E1", L[0], 4.7, "E1. Traditsioonilised fännid samastuvad klubi brändiga", "end"),
+            ("E2", L[1], 4.7, "E2. Kohalikud ja globaalsed fännid moodustavad ühtse kogukonna", "end"),
+            ("E3", L[2], 4.7, "E3. Emotsionaalne side ja lojaalsus klubiga on tugevad", "end"),
         ]),
-        (4.40, 1.10, [
-            ("CORE", 8.0, 12.0, "PEAEESMÄRK: Pärnu külastatavus ja turismitulu on madalhooajal stabiilsed ning kasvavad", "core"),
+        (4.40, 1.30, [
+            ("CORE", 8.0, 12.6, "PEAEESMÄRK: Juventuse fännibaas on taas ühendatud ja samastub klubi identiteediga", "core"),
         ]),
-        (6.30, 1.50, [
-            ("O1", L[0], 4.7, "O1. Aastaringseid ilmast sõltumatuid atraktsioone ja sündmusi on piisavalt", "in"),
-            ("O2", L[1], 4.7, "O2. Sihtkohta turundatakse ühiselt aastaringse tootevalikuna", "in"),
-            ("O3", L[2], 4.7, "O3. Madalhooajal on ligipääs ja teenused tagatud", "in"),
+        (6.50, 1.50, [
+            ("O1", L[0], 4.7, "O1. Identiteet ühendab klubi ajaloo ja kaasaegsuse", "in"),
+            ("O2", L[1], 4.7, "O2. Fännid osalevad brändi kujundamises", "in"),
+            ("O3", L[2], 4.7, "O3. Bränd teenib nii kohalikke kui ka globaalseid fänne", "in"),
         ]),
-        (8.60, 2.10, [
-            ("O1a", R[0], 2.5, "O1a. Investeeringud on suunatud ka aastaringsesse taristusse", "out"),
-            ("O1b", R[1], 2.5, "O1b. Ühine sündmuste kalender toimib", "in"),
-            ("O2a", R[2], 2.5, "O2a. Madalhooaja bränd ja tootepaketid on loodud", "in"),
-            ("O2b", R[3], 2.5, "O2b. Ühisturunduse eelarve on koondatud", "in"),
-            ("O3a", R[4], 2.5, "O3a. Sündmuste ajal on transport tagatud", "out"),
-            ("O3b", R[5], 2.5, "O3b. Ettevõtete lahtiolekuajad on kooskõlastatud", "in"),
+        (8.80, 2.10, [
+            ("O1a", R[0], 2.5, "O1a. Ajalooline vapp on pärand­sümbolina kasutusel", "in"),
+            ("O1b", R[1], 2.5, "O1b. Põhilogo on fännide seas aktsepteeritud", "out"),
+            ("O2a", R[2], 2.5, "O2a. Lahendus on fännidega koos testitud", "in"),
+            ("O2b", R[3], 2.5, "O2b. Toimib alaline fännide nõukogu", "out"),
+            ("O3a", R[4], 2.5, "O3a. Merchandise'is on pärand­kollektsioon", "in"),
+            ("O3b", R[5], 2.5, "O3b. Sõnumid väärtustavad klubi pärandit", "in"),
         ]),
     ]
     links = [("O1a", "O1"), ("O1b", "O1"), ("O2a", "O2"), ("O2b", "O2"), ("O3a", "O3"), ("O3b", "O3"),
@@ -275,7 +269,7 @@ def objective_tree():
     c.connect_up("E2", "E4")
     c.connect_up("E2", "E5")
     c.connect_up("E3", "E5")
-    c.label("lg", 8.0, 11.0, 16.0, 0.9,
+    c.label("lg", 8.0, 11.2, 16.0, 0.9,
             "Kollane – soovitud püsiseisund (eesmärgid); roheline – vahendid projekti ulatuses; "
             "kriipsjoonega – vahendid väljaspool projekti (programmi teised projektid). Nool: vahend → eesmärk.",
             size=9, color="404040")
@@ -303,7 +297,7 @@ def stakeholder_matrix(stakeholders):
     c.line(ox, oy + H, ox + W + 0.3, oy + H, width=15875)
     c.line(ox, oy + H, ox, oy - 0.6, width=15875)
     c.label("xl", ox + W / 2, oy + H + 0.1, 8.0, 0.5, "HUVI projekti vastu (1–5)", size=10, bold=True)
-    c.label("yl", ox + 2.2, 0.0, 4.4, 0.5, "MÕJU projektile (1–5)", size=10, bold=True, align="left")
+    c.label("yl", ox + 2.45, 0.0, 4.4, 0.5, "MÕJU projektile (1–5)", size=10, bold=True, align="left")
     c.label("lo", ox + 0.35, oy + H + 0.1, 0.6, 0.5, "1", size=10)
     c.label("hi", ox + W - 0.35, oy + H + 0.1, 0.6, 0.5, "5", size=10)
 
@@ -313,6 +307,7 @@ def stakeholder_matrix(stakeholders):
         text = f'{s["nr"]}. {s["short"]}'
         w = len(text) * 0.17 + 0.45
         x = ox + W * frac[s["interest"]] + s.get("dx", 0)
+        x = min(max(x, ox + w / 2 + 0.15), ox + W - w / 2 - 0.15)
         y = oy + H * (1 - frac[s["influence"]]) + s.get("dy", 0)
         c.box("S" + str(s["nr"]), x, y - 0.27, w, 0.54, text,
               fill="FFFFFF", line="404040", size=10, geom="roundRect")
@@ -324,25 +319,25 @@ def stakeholder_matrix(stakeholders):
 # ---------------------------------------------------------------------------
 def program_figure():
     c = Canvas("Programm ja portfell", 16.0, 9.0)
-    c.box("S", 8.0, 0.0, 11.0, 1.1,
-          "STRATEEGIA: Pärnu linna arengukava 2018–2035 – aastaringne kuurort- ja elulinn",
+    c.box("S", 8.0, 0.0, 12.0, 1.1,
+          "STRATEEGIA: Juventus kui globaalne jalgpalli- ja elustiilibränd („Black and White and More“, 2017)",
           fill="D9D9D9", line="404040", bold=True, size=10)
-    c.box("PR", 8.0, 1.9, 11.0, 1.1,
-          "PROGRAMM „Aastaringne Pärnu“ (omanik: linnavalitsus; programmi juhtkomitee)",
+    c.box("PR", 8.0, 1.9, 12.0, 1.1,
+          "PROGRAMM „Juventus uuesti ja paremini“ – bränd ja fännisuhted (omanik: klubi juhtkond)",
           fill="DEEAF6", line="2F5496", bold=True, size=10)
     c.box("P1", 2.75, 4.0, 5.1, 1.9,
-          "Projekt 1 (käesolev): „Talvine Pärnu“ sündmuste programm + ühisturundus; 2. etapp „Pärnu Pass“",
+          "Projekt 1 (käesolev, 3 kuud): pärandvapp, kaasav disain ja lansseerimine",
           fill="E2EFDA", line="548235", bold=True, size=10)
     c.box("P2", 8.0, 4.0, 5.0, 1.9,
-          "Projekt 2 (jätkuprojekt): siseranna teostatavus- ja keskkonnamõju eeluuring",
+          "Projekt 2 (jätkuprojekt): alaline fännide nõukogu ja kogukonnaplatvorm",
           fill="FFFFFF", line="7F7F7F", size=10, dash="dash")
     c.box("P3", 13.25, 4.0, 5.1, 1.9,
-          "Projekt 3: madalhooaja sündmuspõhised transpordiühendused (koostöös riigiga)",
+          "Projekt 3: pärandkollektsiooni täismahus tootmine ja litsentsimine",
           fill="FFFFFF", line="7F7F7F", size=10, dash="dash")
     c.box("PF", 8.0, 6.9, 15.6, 1.9,
-          "PORTFELL (ressursid ja teenused): linna investeeringute ja sündmuste toetuste eelarve, "
-          "EL ja riigi meetmed, ettevõtjate kaasrahastus; teenused: sihtkoha turundus (Visit Pärnu), "
-          "kultuuri- ja spordiasutuste sündmused, ühisandmed",
+          "PORTFELL (ressursid ja teenused): klubi turundus- ja brändieelarve, kaubamärgiportfell, "
+          "litsentsi- ja merchandise'i teenused, digikanalid; inimressurss: 8 spetsialistirolli, "
+          "partnerid (tehniline partner, litsentsiaadid)",
           fill="FBE5D6", line="C55A11", size=10)
     c.connect_up("PR", "S")
     for p in ("P1", "P2", "P3"):

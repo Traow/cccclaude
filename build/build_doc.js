@@ -22,8 +22,8 @@ function runs(text, opts = {}) {
   while ((m = re.exec(text))) {
     if (m.index > last) out.push(new TextRun({ text: text.slice(last, m.index), ...opts }));
     const t = m[0];
-    if (t.startsWith("**")) out.push(new TextRun({ text: t.slice(2, -2), bold: true, ...opts }));
-    else out.push(new TextRun({ text: t.slice(1, -1), italics: true, ...opts }));
+    if (t.startsWith("**")) out.push(new TextRun({ ...opts, text: t.slice(2, -2), bold: true }));
+    else out.push(new TextRun({ ...opts, text: t.slice(1, -1), italics: true }));
     last = m.index + t.length;
   }
   if (last < text.length) out.push(new TextRun({ text: text.slice(last), ...opts }));
@@ -93,13 +93,14 @@ const gap = () => new Paragraph({ style: "TableText", children: [] });
 
 // ---------- sisu ----------
 const children = [];
+const PJ = M.PJ, AI = M.AI, EX = M.EX, OM = M.OM;
 
 // TIITELLEHT
 const tc = (t, o = {}) => new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 0 }, children: [new TextRun({ text: t, ...o })] });
 children.push(
   tc("TARTU ÜLIKOOL"), tc("Pärnu kolledž"), tc("[Õppekava nimi]"),
-  new Paragraph({ spacing: { before: 2400 }, alignment: AlignmentType.CENTER, children: [new TextRun(`${M.A}, ${M.B}, ${M.C}, ${M.D}`)] }),
-  new Paragraph({ spacing: { before: 1800, after: 240 }, alignment: AlignmentType.CENTER, children: [new TextRun({ text: "PÄRNU AASTARINGSE KUURORTLINNA ARENDAMINE: MADALHOOAJA KÜLASTATAVUSE SUURENDAMISE PROJEKT", bold: true, size: 28 })] }),
+  new Paragraph({ spacing: { before: 2000 }, alignment: AlignmentType.CENTER, children: [new TextRun(`${PJ}, ${AI}, ${EX}, ${OM}`)] }),
+  new Paragraph({ spacing: { before: 1800, after: 240 }, alignment: AlignmentType.CENTER, children: [new TextRun({ text: "„JUVENTUS UUESTI JA PAREMINI“: JUVENTUS FC REBRÄNDIMISE PROJEKT", bold: true, size: 28 })] }),
   tc("Rühmatöö õppeaines „Projektijuhtimise meetodid ja tehnikad“"),
   tc("Ülesanne 2: alapeatükk 1.2 – probleemide, eesmärkide ja huvipoolte analüüs"),
   new Paragraph({ spacing: { before: 2400 }, alignment: AlignmentType.RIGHT, children: [new TextRun("Juhendaja: T. Tamberg")] }),
@@ -116,176 +117,220 @@ children.push(
 // SISSEJUHATUS
 children.push(
   H1("SISSEJUHATUS"),
-  P("Pärnu on tuntud kui Eesti suvepealinn, kuid linna turismimajanduse suurim nõrkus on tugev hooajalisus: suvel on majutusettevõtete tubade täituvus keskmiselt 60–80%, novembrist märtsini aga vaid 39–50% (Pärnu Linnavalitsus, 2018). Pärnu turismiettevõtjad on hooajalisuse vähendamiseks pakkunud välja mitmeid ideid, sh ilmast sõltumatu siseranna rajamise (ERR, 2023). Käesoleva rühmatöö eesmärk on projektijuhi vaatest välja selgitada, **miks** projekti vaja on, millist püsivat seisundit see peaks looma ning kas projekti omaniku esialgne idee on eesmärkide saavutamiseks mõistlik ja efektiivne."),
-  P("Töö on üles ehitatud projekti määratluse (*project brief*) loogikas: esimene peatükk määratleb projekti, teine kirjeldab planeerimist ning kolmas elluviimist ja lõpetamist (Tamberg, 2022; AXELOS, 2017). Käesolevas ülesandes on terviklikult koostatud alapeatükk 1.2, mis sisaldab kasutatud metoodika kirjeldust, probleemipuud, eesmärgipuud, huvipoolte analüüsi ja kaasamise strateegiat ning lahendusalternatiivide võrdlust. Teiste peatükkide eeldatav sisu on esitatud kursiivis märkustena ja täidetakse järgmistes ülesannetes."),
-  P(`Iga joonise ja tabeli juures on märgitud vastutaja; rühma tööjaotus ja vahetähtajad on esitatud lisas 1, töö õppetunnid lisas 2 ja vestlus tehisaruga lisas 3. Projekt ja selle omanik on õppeülesande raames eeldatud ning ei esinda Pärnu Linnavalitsuse ametlikku seisukohta.`),
+  P("Jaanuaris 2017 esitles Itaalia jalgpalliklubi Juventus FC agentuuriga Interbrand loodud uut visuaalset identiteeti, mille keskmes on minimalistlik „J“-logo. Ajalooline ovaalne vapp koos triipude ja Torino härjaga asendati, et klubi saaks kasvada globaalseks elustiilibrändiks ja jõuda ka „laste, naiste ja millenniumlasteni“ (Football Italia, 2017; Design Week, 2017). Fännide reaktsioon oli suures osas eitav: uut logo peeti liiga anonüümseks ja korporatiivseks (Dezeen, 2017; The Drum, 2017). Rühma hinnangul on rebrändingu järel fännibaas killustunud."),
+  P("Käesoleva rühmatöö eesmärk on projektijuhi vaatest välja selgitada, **miks** projekti „Juventus uuesti ja paremini“ vaja on, millist püsivat seisundit see peaks looma ning milline lahendus ühendab fännid uuesti nii, et see sobiks kõigile osapooltele. Projekti teostusfaas kestab 3 kuud ja eelarve on ligikaudu 96 800 eurot."),
+  P("Töö on üles ehitatud projekti määratluse loogikas: esimene peatükk määratleb projekti, teine kirjeldab planeerimist ning kolmas elluviimist ja lõpetamist (Tamberg, 2022; AXELOS, 2017). Käesolevas ülesandes on terviklikult koostatud alapeatükk 1.2: metoodika, probleemipuu, eesmärgipuu, huvipoolte analüüs ja kaasamise strateegia ning lahendusalternatiivide võrdlus. Teiste peatükkide eeldatav sisu on esitatud kursiivis või esialgsete andmetena. Iga joonise ja tabeli juures on märgitud vastutaja; tööjaotus ja vahetähtajad on lisas 1, õppetunnid lisas 2 ja vestlus tehisaruga lisas 3."),
+  P("Projekt on õppejuhtum: see ei ole seotud Juventus FC-ga ega esinda klubi seisukohti. Omaniku rolli täidab rühmas Ragnar Dietrich."),
 );
 
 // 1. PROJEKTI MÄÄRATLEMINE
 children.push(
   H1("1. PROJEKTI MÄÄRATLEMINE"),
   H2("1.1. Projekti idee ja taust"),
-  planned("[Eeldatav sisu – koostatud ülesandes 1 / täiendatakse: projekti idee, algataja ja omanik, strateegiline sobivus Pärnu linna arengukavaga, ärijuhtumi esialgne kirjeldus (Tamberg, 2022, slaid 8–9). Vastutaja: " + M.A + ".]"),
-  P("Projekti idee lähtekoht on Pärnu linna arengukava 2018–2035 eesmärk vähendada turismi hooajalisust (Pärnu Linnavalitsus, 2018) ning turismiettevõtjate ettepanek rajada linna aastaringne siserand (ERR, 2023). Õppeülesandes eeldame, et projekti omanik on Pärnu Linnavalitsus ja projektijuht on " + M.A + "."),
+  P("Projekti idee on rebrändida Juventus FC nii, et 2017. aasta identiteedimuutuse järel killustunud fännibaas saaks uuesti ühendatud. Projekti aluseks on klubi 2017. aasta rebränding „Black and White and More“, mille eesmärk oli laiendada klubi tegevust jalgpallist kaugemale – moe, meedia ja merchandise’i valdkonda (Design Week, 2017; It’s Nice That, 2017)."),
+  planned(`[Täiendatakse: ärijuhtumi esialgne kirjeldus – strateegiline sobivus, valikute hindamine, ärisuhted, tasuvus ja teostatavus (Tamberg, 2022, slaid 8–9). Vastutaja: ${PJ}.]`),
   H2("1.2. Probleemide, eesmärkide ja huvipoolte analüüs"),
-  P("Alapeatüki eesmärk on enne planeerimist veenduda, et valitakse õige projekt. Probleemiks loetakse lahknevust soovitava ja olemasoleva seisundi vahel **enne projekti**, mitte projekti käigus tekkida võivaid riske (Tamberg, 2022, slaid 11–12). Analüüs liigub järjekorras probleem → põhjuste analüüs → eesmärgid → huvipooled → lahendusideed → lahenduse valik (Tamberg, 2022, slaid 10)."),
+  P("Alapeatüki eesmärk on enne planeerimist veenduda, et valitakse õige projekt. Omanikul võib olla idee „teeme uue logo“, kuid projektijuht peab kindlaks tegema, kas see on eesmärgi saavutamiseks mõistlik ja efektiivne. Probleemiks loetakse lahknevust soovitava ja olemasoleva seisundi vahel **enne projekti**, mitte projekti käigus tekkida võivaid riske (Tamberg, 2022, slaid 11–12). Analüüs liigub järjekorras probleem → põhjuste analüüs → eesmärgid → huvipooled → lahendusideed → lahenduse valik (Tamberg, 2022, slaid 10)."),
 );
 
 // 1.2.1 METOODIKA
 children.push(
   H3("1.2.1. Metoodika ja kasutatud tehnikad"),
   P("Analüüsi aluseks on loogilise raamistiku lähenemine (*Logical Framework Approach*, LFA), mille järgi koostatakse esmalt probleemipuu, see teisendatakse eesmärgipuuks ja valitakse eesmärgipuust projekti ulatusse kuuluvad harud (European Commission, 2004). Rühm kasutas järgmisi tehnikaid:"),
-  N("**Dokumendianalüüs ja näitarvude tehnika** – Pärnu linna ja maakonna arengudokumentide ning majutusstatistika võrdlemine hooaegade lõikes (Tamberg, 2022, slaid 13; Pärnumaa Omavalitsuste Liit, 2019)."),
-  N("**Ajurünnak ja 635-meetod** probleemide, põhjuste ja lahendusideede kogumiseks; kalasaba-diagrammi kategooriaid (taristu, sündmused, turundus, ligipääs, juhtimine) kasutati kontrollnimekirjana, et ükski põhjuste rühm ei jääks märkamata (Ishikawa, 1990; Tamberg, 2022, slaid 18 ja 35)."),
+  N("**Dokumendi- ja meediaanalüüs** – 2017. aasta rebrändingu eesmärkide ja fännide reaktsiooni kaardistamine erialameedia ja klubi teadaannete põhjal (Football Italia, 2017; Dezeen, 2017). Kvantitatiivsed näitajad (näitarvude tehnika) kogub projekti esimesel kuul turu-uuringu analüütik (Tamberg, 2022, slaid 13)."),
+  N("**Ajurünnak ja 635-meetod** probleemide, põhjuste ja lahendusideede kogumiseks; kalasaba-diagrammi kategooriaid (sümboolika, protsess, strateegia, kommunikatsioon, tooted) kasutati kontrollnimekirjana (Ishikawa, 1990; Tamberg, 2022, slaid 18 ja 35)."),
   N("**Probleemipuu** põhjus–tagajärg seoste kaardistamiseks ja **probleemi lause** sõnastamiseks (Tamberg, 2022, slaid 16–20)."),
   N("**5 korda miks** üksikute algpõhjuste sügavuse kontrolliks (Ohno, 1988)."),
-  N("**Eesmärgipuu**, milles negatiivsed seisundid sõnastati soovitud püsiseisunditeks ning märgiti projekti ulatus (Tamberg, 2022, slaid 31–34; European Commission, 2004)."),
+  N("**Eesmärgipuu**, milles negatiivsed seisundid sõnastati soovitud püsiseisunditeks ja märgiti projekti ulatus (Tamberg, 2022, slaid 31–34)."),
   N("**Huvipoolte analüüs**: kontrollküsimused huvipoolte leidmiseks, huvi- ja mõjuhinnangud skaalal 1–5, mõju-huvi maatriks ning kaasamise tasemed (Mendelow, 1981; Bryson, 2004; IAP2, 2018; Tamberg, 2022, slaid 22–30)."),
-  N("**Benchmarking ja kaalutud mitmekriteeriumiline võrdlus** lahendusalternatiivide hindamiseks koos tundlikkusanalüüsiga (Tamberg, 2022, slaid 35–36)."),
-  P("**Probleemianalüüsi tehnika valik.** Rühm võrdles probleemi analüüsiks sobivaid tehnikaid (tabel 1) ja arutles, milline neist aitab kõige paremini vastata küsimusele, miks projekti vaja on. Kalasaba-diagramm ja „5 korda miks“ sobivad hästi protsessi- või kvaliteediprobleemi põhjuste leidmiseks, kuid ei näita probleemi tagajärgi ega teisene otse eesmärkideks (Learn Lean Sigma, s.a.; LinkedIn, s.a.). SWOT kirjeldab organisatsiooni sise- ja väliskeskkonda, mitte põhjuslikke seoseid, mistõttu kasutatakse seda alles alapeatükis 1.3. Pärnu hooajalisus on mitme põhjusega süsteemne probleem, mis puudutab paljusid huvipooli, seega valis rühm **põhitehnikaks probleemipuu**: see näitab nii põhjuseid kui tagajärgi, seob eri huvipoolte probleemid ühiste algpõhjuste kaudu ja teiseneb otse eesmärgipuuks (European Commission, 2004; Tamberg, 2022, slaid 16–17)."),
+  N("**Benchmarking ja kaalutud mitmekriteeriumiline võrdlus** koos tundlikkusanalüüsiga lahendusalternatiivide hindamiseks (Tamberg, 2022, slaid 35–36)."),
+  P("**Probleemianalüüsi tehnika valik.** Rühm võrdles tehnikaid (tabel 1) ja arutles, milline neist aitab kõige paremini vastata küsimusele, miks projekti vaja on. Kalasaba-diagramm ja „5 korda miks“ sobivad protsessi- või kvaliteediprobleemi põhjuste leidmiseks, kuid ei näita probleemi tagajärgi ega teisene otse eesmärkideks (Learn Lean Sigma, s.a.; LinkedIn, s.a.). SWOT kirjeldab organisatsiooni sise- ja väliskeskkonda, mitte põhjuslikke seoseid. Fännibaasi killustumine on mitme põhjusega probleem, mis puudutab väga erinevate huvidega osapooli (omanik, sponsorid, kohalikud ja globaalsed fännid). Seetõttu valis rühm **põhitehnikaks probleemipuu**: see näitab nii põhjuseid kui ka tagajärgi (sh ärilisi), seob eri huvipoolte probleemid ühiste algpõhjuste kaudu ja teiseneb otse eesmärgipuuks (European Commission, 2004; Tamberg, 2022, slaid 16–17)."),
   caption("Tabel", "Probleemianalüüsi tehnikate võrdlus"),
   table([1700, 2550, 2550, 2271],
     ["Tehnika", "Tugevused", "Nõrkused", "Kasutus käesolevas töös"],
     [
-      ["**Probleemipuu** (LFA)", "Näitab põhjusi ja tagajärgi; teiseneb eesmärgipuuks; sobib mitme huvipoolega süsteemsele probleemile", "Võib lihtsustada vastastikmõjusid; sõltub osalejate teadmistest", "Põhitehnika (joonis 1)"],
+      ["**Probleemipuu** (LFA)", "Näitab põhjusi ja tagajärgi; teiseneb eesmärgipuuks; sobib mitme huvipoolega probleemile", "Võib lihtsustada vastastikmõjusid; sõltub osalejate teadmistest", "Põhitehnika (joonis 1)"],
       ["Kalasaba-diagramm (Ishikawa)", "Süstemaatilised põhjuste kategooriad; hea ajurünnaku struktuur", "Ainult põhjused, tagajärjed puuduvad; ei teisene eesmärkideks", "Kategooriad kontrollnimekirjana ajurünnakul"],
-      ["5 korda miks", "Lihtne ja kiire; viib sümptomist algpõhjuseni", "Lineaarne, üks põhjusahel; oht peatuda liiga vara", "Algpõhjuste sügavuse kontroll (nt P3b)"],
+      ["5 korda miks", "Lihtne ja kiire; viib sümptomist algpõhjuseni", "Lineaarne, üks põhjusahel; oht peatuda liiga vara", "Algpõhjuste sügavuse kontroll (nt P1b)"],
       ["SWOT", "Ülevaade sise- ja väliskeskkonnast", "Ei näita põhjuslikke seoseid", "Keskkonna analüüs alapeatükis 1.3"],
     ]),
-  source(`Allikas: autorite koostatud (European Commission, 2004; Ishikawa, 1990; Ohno, 1988; Learn Lean Sigma, s.a.; LinkedIn, s.a.). Vastutaja: ${M.A}.`),
-  P("**Tehisaru ja teaduslike lisaallikate kasutamine.** Rühm kasutas suurt keelemudelit Claude (Anthropic, 2026) töö struktuuri esialgse kavandi koostamiseks, tehnikate võrdluse lähteallikate leidmiseks ning valmis versioonile kriitilise tagasiside saamiseks. Tehisaru pakutud väited ja viited kontrolliti algallikatest; arvulised hinnangud (huvi, mõju, alternatiivide punktid) on rühma ekspertarvamus, mitte tehisaru väljund. Vestlus ja selle põhjal tehtud täiendused on esitatud lisas 3. Hooajalisuse kui nähtuse mõistmiseks kasutati teaduskirjandust turismi hooajalisuse (Butler, 2001) ja sündmusturismi (Getz & Page, 2016) kohta."),
+  source(`Allikas: autorite koostatud (European Commission, 2004; Ishikawa, 1990; Ohno, 1988; Learn Lean Sigma, s.a.; LinkedIn, s.a.). Vastutaja: ${PJ}.`),
+  P(`**Tehisaru ja teaduslike lisaallikate kasutamine.** Rühm kasutas suurt keelemudelit Claude (Anthropic, 2026) töö struktuuri ja analüüsi kavandi koostamiseks, allikate leidmiseks ning valmis versioonile kriitilise tagasiside saamiseks; päringud koostas ja väljundi kvaliteeti kontrollis ${AI}. Tehisaru pakutud väited ja viited kontrolliti algallikatest; huvi- ja mõjuhinnangud ning alternatiivide hinded on rühma ekspertarvamus. Vestlus ja selle põhjal tehtud täiendused on esitatud lisas 3. Spordiklubi brändi ja fännide samastumise mõistmiseks kasutati teaduskirjandust brändiväärtusest (Keller, 1993) ja spordifännide samastumisest klubiga (Wann & Branscombe, 1993).`),
 );
 
 // 1.2.2 PROBLEEMIPUU
 children.push(
   H3("1.2.2. Probleemipuu ja probleemi lause"),
-  P("Põhiprobleem määratleti esmalt erinevate huvipoolte vaatest (Tamberg, 2022, slaid 17): ettevõtjate jaoks on probleemiks madal talvine käive, linna jaoks ebaühtlane linnaruumi kasutus ja maksutulu, elanike jaoks teenuste vähesus talvel. Ühine nimetaja on see, et **Pärnu külastatavus ja turismitulu langevad madalhooajal järsult**. Probleemipuus (joonis 1) on põhiprobleemi all kolm otsest põhjust ja kuus algpõhjust ning selle kohal tagajärjed."),
+  P("Põhiprobleem määratleti esmalt erinevate huvipoolte vaatest (Tamberg, 2022, slaid 17): traditsiooniliste fännide jaoks on probleemiks klubi ajaloolise sümboolika kadumine, omaniku ja turundusosakonna jaoks brändi negatiivne vastuvõtt ning kasutamata müügipotentsiaal, sponsorite jaoks ebastabiilne meediapilt. Ühine nimetaja on see, et **2017. aasta rebrändingu järel on fännibaas killustunud ega samastu ühtse identiteediga**. Probleemipuus (joonis 1) on põhiprobleemi all kolm otsest põhjust ja kuus algpõhjust ning selle kohal tagajärjed."),
   FIG(1),
-  caption("Joonis", `Pärnu madalhooaja probleemipuu (autorite koostatud; andmed: Pärnu Linnavalitsus, 2018; ERR, 2023). Vastutaja: ${M.B}`),
-  P("Algpõhjuste sügavust kontrolliti tehnikaga „5 korda miks“. Näiteks: *Miks on talvel vähe teenuseid?* – Ettevõtted lühendavad lahtiolekuaegu. *Miks?* – Külastajaid on vähe ja lahtihoidmine ei tasu ära. *Miks on külastajaid vähe?* – Puuduvad põhjused tulla (atraktsioonid, sündmused). Ahel näitas, et P3b on **nõiaring**, mida ei saa lahendada ainult ettevõtjaid veenes – vaja on samaaegselt luua nõudlust (P1, P2)."),
-  P("**Probleemi lause.** Ilma selle projektita ei saa Pärnu vähendada turismi hooajalisust, sest oktoobrist aprillini puuduvad ilmast sõltumatud põhjused linna külastamiseks ja sihtkohta turundatakse peamiselt suvise rannapuhkusena, mistõttu langeb majutuse täituvus igal talvel ligikaudu 40–50%-ni, paljud ettevõtted sulgevad ja linna konkurentsivõime aastaringse elukeskkonnana nõrgeneb."),
+  caption("Joonis", `Juventuse fännibaasi killustumise probleemipuu (autorite koostatud; Dezeen, 2017; Football Italia, 2017 põhjal). Vastutaja: ${EX}`),
+  P("Algpõhjuste sügavust kontrolliti tehnikaga „5 korda miks“. Näiteks: *Miks ei samastu traditsioonilised fännid brändiga?* – Logo tundub neile anonüümne ja korporatiivne. *Miks?* – Ovaalne vapp ja Torino härg, mis olid klubi vappides aastakümneid, eemaldati (Dezeen, 2017). *Miks need eemaldati?* – Identiteet loodi eelkõige globaalse elustiilibrändi vajadustest, mitte fännide väärtustest lähtudes (Design Week, 2017). Ahel näitas, et probleem ei ole ainult logo kujundus, vaid **ajaloolise sideme ja kaasamise puudumine**. Seega ei lahendaks probleemi järjekordne „uus logo“ ilma fännide kaasamiseta."),
+  P("Rühm märgib, et fännibaasi killustumise ulatust tuleb mõõta. Projekti esimesel kuul viib turu-uuringu analüütik läbi fännide küsitluse ja sotsiaalmeedia analüüsi, mis annab lähtetaseme eesmärgipuu näitajatele."),
+  P("**Probleemi lause.** Ilma selle projektita ei saa Juventus oma fänne uuesti ühendada, sest 2017. aasta rebränding eemaldas klubi ajaloolise sümboolika ilma fänne kaasamata ning seab esikohale globaalse ärilise sihtrühma, mistõttu ei samastu suur osa traditsioonilisi toetajaid klubi brändiga, fännibaas jaguneb „vanaks“ ja „uueks“ kogukonnaks ning klubi kaotab lojaalsust, mainet ja müügitulu."),
 );
 
 // 1.2.3 EESMÄRGIPUU
 children.push(
   H3("1.2.3. Eesmärgipuu ja projekti ulatus"),
-  P("Eesmärgipuu (joonis 2) koostati probleemipuu negatiivsete seisundite ümbersõnastamisel soovitud, tulevikus püsivateks seisunditeks – mitte tegevusteks (Tamberg, 2022, slaid 31–34). Seejärel otsustati, milliste alameesmärkide saavutamine kuulub käesoleva projekti ulatusse ja millised jäetakse programmi teistele projektidele (vt alapeatükk 1.2.6)."),
+  P("Eesmärgipuu (joonis 2) koostati probleemipuu negatiivsete seisundite ümbersõnastamisel soovitud, tulevikus püsivateks seisunditeks – mitte tegevusteks (Tamberg, 2022, slaid 31–34). Näiteks „uus logo on valmis“ on projekti tulem, mitte eesmärk; eesmärk on, et fännid samastuksid klubi identiteediga. Seejärel otsustati, milliste alameesmärkide saavutamine kuulub 3-kuulise projekti ulatusse ja millised jäetakse programmi teistele projektidele (vt alapeatükk 1.2.6)."),
   FIG(2),
-  caption("Joonis", `Pärnu aastaringse külastatavuse eesmärgipuu (autorite koostatud). Vastutaja: ${M.B}`),
-  P("Peaeesmärgi saavutamist mõõdetakse järgmiste näitajatega (lähtetase 2025. aasta madalhooaja andmed):"),
-  B("majutuse täituvus novembrist märtsini vähemalt 55% aastaks 2030 (lähtetase ca 39–50%);"),
-  B("madalhooaja majutatute arv kasvab 15% kolme aasta jooksul;"),
-  B("aastaringselt avatud toitlustus- ja vaba aja ettevõtete osakaal kasvab;"),
-  B("madalhooajal toimuvate rahvusvahelise kõlapinnaga sündmuste arv kasvab vähemalt neljani aastas."),
-  P("Projekti ulatusse kuuluvad alameesmärgid O1b, O2a, O2b ja O3b, mis on saavutatavad koostöö, turunduse ja sündmuste korraldamise kaudu. Aastaringse taristu investeeringud (O1a) ja transpordiühendused (O3a) jäetakse programmi eraldi projektidele, sest need vajavad pikemat ettevalmistust, teiste otsustajate (volikogu, riik) heakskiitu ja keskkonnaalaseid kooskõlastusi."),
+  caption("Joonis", `Juventuse fännibaasi taasühendamise eesmärgipuu (autorite koostatud). Vastutaja: ${OM}`),
+  P("Peaeesmärgi saavutamist mõõdetakse järgmiste näitajatega (lähtetase mõõdetakse projekti 1. kuul):"),
+  B("fännide samastumise indeks (küsitlus, skaala 1–8) tõuseb 6 kuu jooksul pärast lansseerimist vähemalt 1 palli võrra nii kohalike kui ka globaalsete fännide seas (Wann & Branscombe, 1993);"),
+  B("brändi kohta tehtud negatiivsete sotsiaalmeediapostituste osakaal väheneb poole võrra võrreldes lähtetasemega;"),
+  B("pärandkollektsiooni müük moodustab esimesel hooajal vähemalt 10% merchandise’i käibest;"),
+  B("ametlike fänniklubide liikmete arv kasvab."),
+  P("Projekti ulatusse kuuluvad alameesmärgid O1a, O2a, O3a ja O3b, mis on saavutatavad 3 kuu ja 96 800-eurose eelarvega. Põhilogo laialdane aktsepteerimine (O1b) ja alaline fännide nõukogu (O2b) jäetakse programmi jätkuprojektidele, sest need vajavad pikemat aega ja klubi juhtimiskorralduse muutmist."),
 );
 
 // 1.2.4 HUVIPOOLED
+const quadrantOf = (s) => (s.influence >= 4 ? (s.interest >= 4 ? "Võtmeisik" : "Hoia rahul") : (s.interest >= 4 ? "Hoia informeerituna" : "Jälgi"));
+const qFill = { "Võtmeisik": "F8CBAD", "Hoia rahul": "FFF2CC", "Hoia informeerituna": "DEEAF6", "Jälgi": "E2EFDA" };
 const shRows = stakeholders.map((s) => {
-  const quadrant = s.influence >= 4 ? (s.interest >= 4 ? "Võtmeisik" : "Hoia rahul") : (s.interest >= 4 ? "Hoia informeerituna" : "Jälgi");
-  const q = { "Võtmeisik": "F8CBAD", "Hoia rahul": "FFF2CC", "Hoia informeerituna": "DEEAF6", "Jälgi": "E2EFDA" }[quadrant];
+  const quadrant = quadrantOf(s);
   return [
     { t: `${s.nr}. ${s.name}` },
     { t: String(s.interest), align: AlignmentType.CENTER },
     { t: s.wish },
     { t: String(s.influence), align: AlignmentType.CENTER },
     { t: s.mode },
-    { t: `**${quadrant}:** ${s.strategy.split(": ").slice(1).join(": ")}`, fill: q },
+    { t: `**${quadrant}:** ${s.strategy.split(": ").slice(1).join(": ")}`, fill: qFill[quadrant] },
   ];
 });
 children.push(
   H3("1.2.4. Huvipoolte analüüs ja kaasamise strateegia"),
-  P("Huvipooled leiti kontrollküsimuste abil: kelle vaated ja kogemused on asjakohased, kes on otsustajad, kes hakkavad otsuste järgi tegutsema, kelle toetus on edu jaoks oluline, kellel on õigus tulemustest kasu saada ja kes võib tunda end ohustatuna (Tamberg, 2022, slaid 22). Huvi ja mõju hinnati skaalal 1–5 rühma konsensuse alusel; hinnangud valideeritakse projekti algatamisel intervjuudega. Tabelis 2 on esitatud huvipoolte huvi tingimused ja kaasamise strateegia, joonisel 3 nende paiknemine mõju-huvi maatriksis (Mendelow, 1981; Eden & Ackermann, 1998)."),
+  P("Huvipooled leiti kontrollküsimuste abil: kelle vaated ja kogemused on asjakohased, kes on otsustajad, kes hakkavad otsuste järgi tegutsema, kelle toetus on edu jaoks oluline, kellel on õigus tulemustest kasu saada ja kes võib tunda end ohustatuna (Tamberg, 2022, slaid 22). Lähtepunktiks olid rühma määratletud huvipooled – omanikud, osanikud, mängijad, toetajad, fännid, sponsorid ning kohalik omavalitsus ja elanikud –, mida täiendati „väravavahtidega“ (kaubamärgiametid, liiga) ning meedia ja litsentsipartneritega (Tamberg, 2022, slaid 24). Huvi ja mõju hinnati skaalal 1–5 rühma konsensuse alusel; hinnangud valideeritakse projekti esimesel kuul intervjuude ja küsitlusega. Tabelis 2 on esitatud huvipoolte huvi tingimused ja kaasamise strateegia, joonisel 3 nende paiknemine mõju-huvi maatriksis (Mendelow, 1981; Eden & Ackermann, 1998)."),
   caption("Tabel", "Huvipoolte analüüs ja kaasamise strateegia"),
   table([1900, 680, 1850, 680, 1650, 2311],
     ["Huvipool", "Huvi (1–5)", "Huvi (osalemise, toetamise) tingimus", "Mõju (1–5)", "Osalemise või mõju viis", "Kaasamise strateegia"],
     shRows),
-  source(`Allikas: autorite koostatud (Tamberg, 2022, slaid 28; Mendelow, 1981). Värv vastab maatriksi ruudule joonisel 3. Vastutaja: ${M.C}.`),
+  source(`Allikas: autorite koostatud (Tamberg, 2022, slaid 28; Mendelow, 1981). Värv vastab maatriksi ruudule joonisel 3. Vastutaja: ${PJ}.`),
   FIG(3),
-  caption("Joonis", `Huvipoolte mõju-huvi maatriks (autorite koostatud Mendelow, 1981 ja Tamberg, 2022, slaid 29 põhjal). Vastutaja: ${M.C}`),
-  P("**Erinevasuunalised huvid.** Huvipoolte eesmärgid on ühitatavad (Tamberg, 2022, slaid 21), kuid mitmes kohas vastanduvad (tabel 3). Projektijuhi ülesanne on vastuolud varakult nähtavaks teha ja leida kokkulepped, mille korral ühine huvi (madalhooaja külastatavuse kasv) kaalub üles erihuvid (Bryson, 2004)."),
+  caption("Joonis", `Huvipoolte mõju-huvi maatriks (autorite koostatud Mendelow, 1981 ja Tamberg, 2022, slaid 29 põhjal). Vastutaja: ${PJ}`),
+  P("**Erinevasuunalised huvid.** Huvipoolte eesmärgid peavad olema ühitatavad (Tamberg, 2022, slaid 21), kuid rebrändingu puhul vastanduvad need tugevalt (tabel 3). Kõige teravam on vastuolu traditsiooniliste fännide, kes soovivad vana vapi tagasitoomist, ning omaniku ja turundusosakonna vahel, kes soovivad kaitsta 2017. aasta investeeringut ja globaalset brändi. Projektijuhi ülesanne on vastuolud varakult nähtavaks teha ja leida kokkulepped, mille korral ühine huvi – tugev ja ühtne fännibaas – kaalub üles erihuvid (Bryson, 2004)."),
   caption("Tabel", "Huvipoolte vastandlikud huvid ja kavandatud kokkulepped"),
   table([2300, 3100, 3671],
     ["Vastuolu", "Huvipoolte soovid", "Huvide ühitamine ja kokkulepe"],
     [
-      ["Suurinvesteering vs eelarvedistsipliin", "Majutusettevõtted (3) soovivad siseranda ja avalikku kaasrahastust; volikogu (2) ja linnavalitsus (1) tõendatud tasuvust", "Siserand viiakse eraldi teostatavusuuringu projekti (joonis 4); otsus tehakse uuringu ja käesoleva projekti tulemusnäitajate põhjal"],
-      ["Sündmuste maht vs elukvaliteet", "Korraldajad (5) ja ettevõtted (4) soovivad rohkem ja hilisemaid sündmusi; elanikud (6) vaikust ja parkimist", "„Hea naabruse“ kokkulepe: müraajad, parkimise ja ühistranspordi korraldus, elanike soodustus sündmustele, avalik arutelu enne kalendri kinnitamist"],
-      ["Suured vs väikesed ettevõtted", "Suured spaad soovivad ühisturunduses suuremat nähtavust, väikeettevõtted võrdset kohtlemist", "Koostöömemorandum: ühisturunduse panus ja nähtavus proportsionaalselt voodikohtade arvuga, väikeettevõtetele ühispaketid"],
-      ["Arendus vs looduskaitse", "Ettevõtjad soovivad rannaalal taristut; keskkonnaühendused (10) kaitset", "Käesolev projekt ei ehita rannaalale; jätkuprojektis keskkonnamõju eelhinnang enne investeerimisotsust"],
-      ["Hind vs tulu", "Külastajad (11) soovivad soodsat hinda; ettevõtjad kõrgemat keskmist arvet", "Paketid lisaväärtusega (sündmus + majutus + toit), soodustused madalaima nõudlusega nädalatel"],
+      ["Traditsioon vs globaalne bränd", "Toetajad (5) ja kohalikud fännid (7) soovivad ajaloolist vappi; omanik (1) ja turundus (2) globaalset „J“-brändi", "Kahetasandiline lahendus: „J“ jääb äriliseks kaubamärgiks, pärandvapp tuleb tagasi mängusärgile ja pärandkollektsiooni; kokkulepe kinnitatakse juhtkomitees"],
+      ["Kohalikud vs globaalsed fännid", "Kohalikud (7) väärtustavad Torino ajalugu, globaalsed (6) kaasaegset disaini ja digisisu", "Disaini testitakse mõlema rühmaga (fookusgrupid Torinos, veebiküsitlus); kampaania räägib ühist lugu „ajalugu + tulevik“"],
+      ["Muutus vs stabiilsus", "Sponsorid (8) ja litsentsipartnerid (10) soovivad stabiilsust ja vanade laovarude läbimüüki", "Üleminekuperiood ja tootmisgraafik lepitakse kokku 1. kuul; pärandkollektsioon on täiendus, mitte asendus"],
+      ["Linna sümbol vs klubi kaubamärk", "Torino linn (9) soovib härja sümboli korrektset kasutust; klubi soovib kaubamärgiõigust", "Kaubamärgiõiguse spetsialist selgitab kasutusõiguse ja vajadusel sõlmitakse linnaga kasutuskokkulepe"],
+      ["Kulu vs tulu", "Osanikud (3) soovivad kulude põhjendatust; fännid kvaliteetset lahendust", "Eelarve 96 800 € koos reserviga, mõõdetavad näitajad ja etapiviisiline otsustamine"],
     ]),
-  source(`Allikas: autorite koostatud. Sulgudes on huvipoole number tabelist 2. Vastutaja: ${M.C}.`),
-  P("**Kaasamise strateegia.** Kaasamise intensiivsus valiti vastavalt mõjukuse ja huvi määrale (Mendelow, 1981) ning IAP2 kaasamise spektri tasemetele (informeerimine, konsulteerimine, kaasamine, koostöö, otsustusõiguse andmine) (IAP2, 2018):"),
-  B("**Võtmeisikud** (1, 3, 7) – koostöö tasand: liikmed projekti juhtkomitees, kes kinnitab iga etapi lõpus ärijuhtumi aktuaalsuse; sõlmitakse koostöömemorandum ja ühisturunduse rahastusvalem."),
-  B("**Hoia rahul** (2, 8, 10) – konsulteerimine: kvartaalsed lühiülevaated mõõdetavate näitajatega, varajane konsultatsioon rahastajate ja kooskõlastajatega, et vältida „väravavahtide“ hilist vastuseisu (Tamberg, 2022, slaid 24)."),
-  B("**Hoia informeerituna** (4, 5, 12, 13) – kaasamine töörühmadesse (sündmuste kalender, lahtiolekuajad); eesmärk on huvi kasvatades viia ettevõtjad ja korraldajad võtmeisikute rühma (Tamberg, 2022, slaid 29)."),
-  B("**Jälgi** (6, 9, 11) – informeerimine ja konsulteerimine: uudiskiri, linna veeb, avalik arutelu ja külastajaküsitlused; elanike puhul on mõju madal, kuid nende rahulolematus võib kanduda volikogu kaudu, seetõttu kaasatakse nad enne sündmuste kalendri kinnitamist."),
-  P("Kaasamise eest vastutab projektijuht, iga huvipoolte rühma jaoks määratakse rühma liikmest kontaktisik (lisa 1). Huvipoolte register vaadatakse üle iga etapi lõpus, sest huvipoolte huvi ja mõju võivad projekti käigus muutuda."),
+  source(`Allikas: autorite koostatud. Sulgudes on huvipoole number tabelist 2. Vastutaja: ${PJ}.`),
+  P("**Kaasamise strateegia.** Kaasamise intensiivsus valiti vastavalt mõjukuse ja huvi määrale (Mendelow, 1981) ning IAP2 kaasamise spektri tasemetele – informeerimine, konsulteerimine, kaasamine, koostöö ja otsustusõiguse andmine (IAP2, 2018):"),
+  B("**Võtmeisikud** (1, 2, 8) – koostöö: juhtkomitee liikmed, kes kinnitavad iga etapi lõpus lahenduse ja ärijuhtumi aktuaalsuse; sponsoritega lepitakse kokku tootmis- ja üleminekugraafik."),
+  B("**Hoia rahul** (11, 12) – konsulteerimine: meedia saab eelinfot ja lugusid suhtekorraldusplaani järgi; kaubamärgiametitele esitatakse nõuetekohased taotlused juba 1. kuul, et vältida „väravavahtide“ tekitatud viivitusi (Tamberg, 2022, slaid 24)."),
+  B("**Hoia informeerituna** (5, 6, 7, 10) – kaasamine: fännid osalevad fookusgruppides, disaini testimisel ja hääletusel. Eesmärk on tõsta organiseeritud toetajate mõju ja muuta nad projekti toetajateks ehk viia nad võtmeisikute rühma (Tamberg, 2022, slaid 29)."),
+  B("**Jälgi** (3, 4, 9, 13) – informeerimine: investorsuhete teade, mängijad kaasatakse kampaaniasse saadikutena, linnaga konsulteeritakse härja sümboli osas ning liiga nõuded kontrollitakse enne särgi kujunduse kinnitamist."),
+  P(`Kaasamise eest vastutab projektijuht ${PJ}. Huvipoolte register vaadatakse üle iga kuu lõpus, sest huvipoolte huvi ja mõju võivad projekti käigus muutuda – näiteks võib meedia tähelepanu järsult tõsta fännide mõju.`),
 );
 
 // 1.2.5 ALTERNATIIVID
+const best = "B+D";
 const altRows = alternatives.map((a) => [
-  { t: `**${a.id}** – ${a.name}`, fill: a.id === "A+C" ? "E2EFDA" : undefined },
-  ...a.scores.map((s) => ({ t: String(s), align: AlignmentType.CENTER, fill: a.id === "A+C" ? "E2EFDA" : undefined })),
-  { t: `**${fmt(a.total)}**`, align: AlignmentType.CENTER, fill: a.id === "A+C" ? "E2EFDA" : undefined },
+  { t: `**${a.id}** – ${a.name}`, fill: a.id === best ? "E2EFDA" : undefined },
+  ...a.scores.map((s) => ({ t: String(s), align: AlignmentType.CENTER, fill: a.id === best ? "E2EFDA" : undefined })),
+  { t: `**${fmt(a.total)}**`, align: AlignmentType.CENTER, fill: a.id === best ? "E2EFDA" : undefined },
 ]);
 const A_ = Object.fromEntries(alternatives.map((a) => [a.id, a]));
 children.push(
   H3("1.2.5. Lahendusideed ja alternatiivide võrdlus"),
-  P("Lahendusideed koguti ajurünnaku ja 635-meetodi abil ning benchmarking’u teel (Tamberg, 2022, slaid 35). Võrdlusalustena vaadeldi talviste sündmuste programme teistes Põhjamaade kuurortides ja ERR-i (2023) artiklis eeskujuna nimetatud Saksamaa Brandenburgi liidumaa siseveekeskust. Ideed rühmitati kolmeks põhimõtteliselt erinevaks alternatiiviks, millele lisati nende kombinatsioon ja nullalternatiiv:"),
-  B("**A – „Talvine Pärnu“ sündmuste programm ja ühisturundus**: ühine madalhooaja sündmuste kalender, 3–4 suursündmust, majutuse-sündmuse paketid ja koondatud turunduseelarve."),
-  B("**B – Siserand**: aastaringne vee- ja vabaajakeskus konverentsi- ja kontserdivõimekusega (ettevõtjate esialgne idee; ERR, 2023)."),
-  B("**C – „Pärnu Pass“**: digitaalne ühispileti ja broneerimise platvorm, mis koondab madalhooaja teenused ning kogub nõudluse andmeid."),
-  B("**A+C** – etapiviisiline kombinatsioon: esmalt sündmuste programm ja ühisturundus, seejärel platvorm."),
-  B("**0 – nullalternatiiv**: iga osapool jätkab senist tegevust."),
+  P("Lahendusideed koguti ajurünnaku ja 635-meetodi abil ning benchmarking’u teel (Tamberg, 2022, slaid 35): vaadeldi, kuidas teised klubid on oma sümboolikat muutnud ning millist rolli on seejuures mänginud fännide kaasamine. Ideed rühmitati neljaks põhimõtteliselt erinevaks alternatiiviks, millele lisati kombinatsioon ja nullalternatiiv:"),
+  B("**A – ajaloolise ovaalse vapi täielik taastamine**: „J“-logost loobutakse ja naastakse 2017. aasta eelse vapi juurde."),
+  B("**B – kahetasandiline bränd**: „J“ jääb äriliseks ja digitaalseks kaubamärgiks, ajalooline vapp (sh triibud ja härg) tuleb tagasi pärandsümbolina mängusärgile ja pärandkollektsiooni."),
+  B("**C – „J“-logo ümberkujundamine koos fännidega**: uus logo, mis lisab „J“-le ajaloolisi elemente ja mille disain valitakse fännide hääletusel."),
+  B("**D – kogukonna- ja kommunikatsiooniprogramm**: visuaali ei muudeta, kuid käivitatakse fännide kaasamise ja ajaloo väärtustamise kampaania."),
+  B("**B+D** – pärandvapp koos fännide kaasamise programmiga (disaini testimine, fännifoorum, kampaania)."),
+  B("**0 – nullalternatiiv**: senine bränd jätkub muutmata kujul."),
   P("Alternatiive võrreldi huvipoolte eesmärkide saavutamise määra, teostatavuse, kulu ja riskantsuse lõikes (Tamberg, 2022, slaid 36). Kriteeriumide kaalud lepiti kokku enne hindamist, et vältida kaalude sobitamist eelistatud lahendusele (tabel 4)."),
   caption("Tabel", "Lahendusalternatiivide kaalutud võrdlus (hinded 1–5, 5 = parim)"),
   table([2411, 860, 860, 860, 860, 860, 860, 1500],
     ["Alternatiiv", ...criteria.map((c) => `${c.id}\n${Math.round(c.w * 100)}%`), "Kaalutud summa"],
     altRows),
-  source(`Kriteeriumid: ${criteria.map((c) => `${c.id} – ${c.name}`).join("; ")}. Allikas: autorite koostatud. Vastutaja: ${M.D}.`),
-  P(`Kaalutud summa järgi on parim kombinatsioon **A+C** (${fmt(A_["A+C"].total)}), sellele järgneb alternatiiv A (${fmt(A_.A.total)}). Ettevõtjate algne idee B (${fmt(A_.B.total)}) annaks küll suurima mõju põhieesmärgile, kuid on kõige kallim, aeganõudvam ja riskantsem ning vajab keskkonnakooskõlastusi. Tundlikkusanalüüs näitas, et kui kulu kaal tõsta 30%-ni, on A (${fmt(A_.A.sensCost)}) ja A+C (${fmt(A_["A+C"].sensCost)}) praktiliselt võrdsed ning B langeb veelgi (${fmt(A_.B.sensCost)}); riski kaalu tõstmine 25%-ni järjestust ei muuda. Seega on otsus kaalude suhtes stabiilne: alustada tuleb alternatiivist A ja lisada C teise etapina siis, kui esimese etapi tulemused õigustavad platvormi kulu.`),
-  P("Alternatiivid täidavad eesmärgipuu alameesmärke erinevalt (tabel 5): A katab peamiselt sündmuste ja turunduse haru, C ligipääsu ja teenuste kättesaadavuse haru ning B aastaringse taristu haru."),
+  source(`Kriteeriumid: ${criteria.map((c) => `${c.id} – ${c.name}`).join("; ")}. Allikas: autorite koostatud. Vastutaja: ${OM} (kaasteostaja ${EX}).`),
+  P(`Kaalutud summa järgi on parim kombinatsioon **B+D** (${fmt(A_["B+D"].total)}), sellele järgneb alternatiiv B (${fmt(A_.B.total)}). Vana vapi täielik taastamine (A, ${fmt(A_.A.total)}) rahuldaks küll traditsioonilisi fänne, kuid tühistaks 2017. aasta investeeringu, tekitaks vastuseisu omanikus ja sponsorites ning ei mahu 96 800-eurose eelarve ja 3 kuu sisse, sest kõik kaubamärgid, tooted ja kanalid tuleks ümber teha. Samal põhjusel jääb eelarvest ja ajast välja uue logo loomine (C, ${fmt(A_.C.total)}). Ainult kommunikatsioon (D, ${fmt(A_.D.total)}) on odav ja kiire, kuid ei kõrvalda algpõhjust P1 – ajaloolise sümboolika puudumist.`),
+  P(`Tundlikkusanalüüs: kui eelarve kriteeriumi kaal tõsta 30%-ni, jääb B+D endiselt parimaks (${fmt(A_["B+D"].sensCost)}; B ${fmt(A_.B.sensCost)}, D ${fmt(A_.D.sensCost)}). Riski kaalu tõstmine 25%-ni järjestust ei muuda (B+D ${fmt(A_["B+D"].sensRisk)}). Seega on otsus kaalude suhtes stabiilne ning projekti omanikule soovitatakse alternatiivi **B+D**.`),
+  P("Alternatiivid täidavad eesmärgipuu alameesmärke erinevalt (tabel 5): A ja B katavad sümboolika haru, C ja D kaasamise ja kommunikatsiooni haru. Ainult kombinatsioon katab kõik kolm haru."),
   caption("Tabel", "Alternatiivide panus eesmärgipuu alameesmärkidesse"),
-  table([2771, 900, 900, 900, 900, 900, 900, 900],
+  table([2411, 860, 860, 860, 860, 860, 860, 1500],
     ["Alternatiiv", "O1a", "O1b", "O2a", "O2b", "O3a", "O3b", "Kokku"],
     [
-      ["A – sündmused ja ühisturundus", "0", "1", "1", "1", "0,5", "0,5", "4,0"],
-      ["B – siserand", "1", "0,5", "0,5", "0", "0", "0,5", "2,5"],
-      ["C – „Pärnu Pass“", "0", "0,5", "0,5", "0,5", "0,5", "1", "3,0"],
-      ["A+C", "0", "1", "1", "1", "0,5", "1", "4,5"],
+      ["A – vana vapi taastamine", "1", "0,5", "0", "0", "0,5", "0,5", "2,5"],
+      ["B – kahetasandiline bränd", "1", "0,5", "0", "0", "1", "0,5", "3,0"],
+      ["C – „J“ ümberkujundamine", "0,5", "1", "1", "0,5", "0", "0,5", "3,5"],
+      ["D – kommunikatsioon", "0", "0", "0,5", "0,5", "0", "1", "2,0"],
+      ["B+D", "1", "0,5", "1", "0,5", "1", "1", "5,0"],
       ["0 – nullalternatiiv", "0", "0", "0", "0", "0", "0", "0,0"],
     ].map((r) => r.map((v, i) => ({ t: v, align: i ? AlignmentType.CENTER : AlignmentType.LEFT }))),
   ),
-  source(`Märkus: 1 – täielik panus, 0,5 – osaline panus, 0 – panus puudub; tähised vastavad joonisele 2. Allikas: autorite koostatud. Vastutaja: ${M.D}.`),
+  source(`Märkus: 1 – täielik panus, 0,5 – osaline panus, 0 – panus puudub; tähised vastavad joonisele 2. Allikas: autorite koostatud. Vastutaja: ${OM}.`),
 );
 
 // 1.2.6 ÄRIJUHTUM, PROGRAMM, PORTFELL
 children.push(
   H3("1.2.6. Ärijuhtumi seire, programm ja portfell"),
-  P("Projekti omanikul võib olla idee, kuid projektijuhi ülesanne on tagada, et kavandatav töö viib omaniku ja huvipoolte eesmärgile võimalikult efektiivselt lähemale (Tamberg, 2022, slaid 8; AXELOS, 2017). Analüüsi tulemusel tehakse omanikule ettepanek käsitleda siseranna ideed mitte kohe investeerimisprojektina, vaid jätkuprojektina, mille aluseks on teostatavus- ja keskkonnamõju eeluuring ning käesoleva projekti tegelikud nõudlusandmed."),
-  P("Projekt kuulub programmi „Aastaringne Pärnu“, mis teenib Pärnu linna arengukava strateegilist eesmärki (joonis 4). Programm võimaldab ühitada mitut omavahel seotud projekti ja jagada ressursse; portfelli tasandil otsustatakse, milliseid linna ja partnerite ressursse ning teenuseid (eelarve, toetusmeetmed, sihtkoha turundus, kultuuriasutuste sündmused) projektidele eraldatakse (PMI, 2021; ISO, 2012)."),
+  P("Projekti omanikul võib olla idee, kuid projektijuhi ülesanne on tagada, et kavandatav töö viib omaniku ja huvipoolte eesmärgile võimalikult efektiivselt lähemale (Tamberg, 2022, slaid 8; AXELOS, 2017). Analüüsi tulemusel tehakse omanikule ettepanek mitte luua täiesti uut logo, vaid taastada klubi ajalooline sümboolika pärandvapina ja kaasata fännid lahenduse loomisse."),
+  P("Projekt kuulub programmi „Juventus uuesti ja paremini“, mis teenib klubi strateegilist eesmärki olla nii tugev jalgpalliklubi kui ka globaalne elustiilibränd (joonis 4). Programm võimaldab ühitada mitut omavahel seotud projekti: käesolev 3-kuuline projekt loob pärandvapi ja lansseerib selle, jätkuprojektid loovad alalise fännide nõukogu ja pärandkollektsiooni täismahus tootmise. Portfelli tasandil otsustatakse, milliseid klubi ressursse (brändi- ja turunduseelarve, kaubamärgiportfell, litsentsi- ja merchandise’i teenused, digikanalid) projektidele eraldatakse (PMI, 2021; ISO, 2012)."),
   FIG(4),
-  caption("Joonis", `Projekti seos strateegia, programmi ja portfelliga (autorite koostatud). Vastutaja: ${M.A}`),
+  caption("Joonis", `Projekti seos strateegia, programmi ja portfelliga (autorite koostatud). Vastutaja: ${PJ}`),
   P("Ärijuhtumi aktuaalsust ja projekti sisu adekvaatsust jälgitakse kogu projekti vältel paindlikult:"),
-  B("iga etapi lõpus (PRINCE2 etapipiir) vaatab juhtkomitee üle probleemi- ja eesmärgipuu, huvipoolte registri ja tulemusnäitajad ning otsustab jätkamise, muutmise või lõpetamise (AXELOS, 2017);"),
-  B("pärast iga madalhooaja sündmust analüüsitakse külastatavuse ja täituvuse andmeid; kui näitajad ei parane, korrigeeritakse sündmuste ja paketti sisu järgmiseks iteratsiooniks;"),
-  B("kui väliskeskkond muutub (nt Rail Balticu ühenduse avanemine, uus toetusmeede või eraarendaja investeering), hinnatakse alternatiivid uuesti ning vajadusel muudetakse projekti ulatust või programmi koosseisu."),
+  B("iga kuu lõpus (PRINCE2 etapipiir) vaatab juhtkomitee üle probleemi- ja eesmärgipuu, huvipoolte registri ja näitajad ning otsustab jätkamise, muutmise või lõpetamise (AXELOS, 2017);"),
+  B("1. kuu turu-uuringu tulemused on otsustuspunkt: kui fännid ei toeta pärandvapi ideed, hinnatakse alternatiivid uuesti;"),
+  B("disaini testitakse fännidega iteratiivselt (kaks vooru) ja lahendust kohandatakse tagasiside põhjal;"),
+  B("kui väliskeskkond muutub (nt omaniku strateegia, sponsorlepingud või kaubamärgiõiguslik takistus), muudetakse vajadusel projekti ulatust või programmi koosseisu."),
 );
 
-// 1.3–3 eeldatav
+// 1.3–3
+const team = [
+  ["Brändistrateeg", "Brändi arhitektuur (põhilogo + pärandvapp), sõnumid", "1.–2. kuu"],
+  ["Graafiline disainer", "Pärandvapi ja brändiraamatu kujundus", "1.–2. kuu"],
+  ["Kaubamärgiõiguse spetsialist", "Õiguskontroll, registreerimine, Torino härja kasutusõigus", "1.–3. kuu"],
+  ["Digitaalse sisu spetsialist", "Digikampaania, sotsiaalmeedia ja veebisisu", "2.–3. kuu"],
+  ["Merchandise’i tootmiskoordinaator", "Pärandkollektsiooni prototüübid, koostöö litsentsiaatidega", "2.–3. kuu"],
+  ["Sisekommunikatsiooni töötaja", "Töötajate ja mängijate informeerimine, brändisaadikud", "1.–3. kuu"],
+  ["Turu-uuringu analüütik", "Fännide küsitlus, fookusgrupid, lähtetase ja järelmõõtmine", "1. ja 3. kuu"],
+  ["Suhtekorraldusjuht", "Meediasuhted, lansseerimine, kriisikommunikatsioon", "1.–3. kuu"],
+];
+const budget = [
+  ["Turu-uuring ja fännide kaasamine", 9800],
+  ["Brändistrateegia ja kontseptsioon", 12000],
+  ["Visuaalne identiteet (disain, brändiraamat)", 22000],
+  ["Kaubamärgi õiguskaitse", 11000],
+  ["Merchandise’i prototüübid ja tootmise ettevalmistus", 14000],
+  ["Lansseerimiskampaania, digisisu ja suhtekorraldus", 19000],
+  ["Reserv ootamatute kulude katteks", 9000],
+];
+const eur = (n) => n.toLocaleString("fr-FR").replace(/ | /g, " ") + " €";
+const btotal = budget.reduce((s, b) => s + b[1], 0);
 children.push(
   H2("1.3. Keskkonna ja esmaste riskide analüüs"),
-  planned(`[Eeldatav sisu: PESTLE ja SWOT; esmaste riskide register (tõenäosus × mõju), riskide maandamise ja väljumisstrateegia (Tamberg, 2022, slaid 11). Vastutaja: ${M.D}.]`),
+  planned(`[Eeldatav sisu: PESTLE ja SWOT; esmaste riskide register (nt fännide uus vastureaktsioon, kaubamärgiõiguslik takistus, sponsori vastuseis, ajakava nihkumine), maandamine ja väljumisstrateegia (Tamberg, 2022, slaid 11). Vastutaja: ${EX}.]`),
   H2("1.4. Projekti määratlus ja projektiettepanek"),
-  planned(`[Eeldatav sisu: projekti eesmärk ja tulemid, ulatus ja piirid, ärijuhtum (strateegiline sobivus, valikute hindamine, ärisuhted, tasuvus ja rahastamine, teostatavus), projekti organisatsioon (Tamberg, 2022, slaid 8–9). Vastutaja: ${M.A}.]`),
+  P("Projekti nimi on „Juventus uuesti ja paremini“. Projekti teostusfaas kestab 3 kuud, eelarve on ligikaudu 96 800 eurot. Projekti meeskonnas on kaheksa spetsialistirolli (tabel 6)."),
+  caption("Tabel", "Projekti meeskonna rollid (esialgne)"),
+  table([2600, 4671, 1800],
+    ["Roll", "Vastutus", "Kaasatus"],
+    team.map((r) => r.map((v) => ({ t: v })))),
+  source(`Allikas: autorite koostatud. Vastutaja: ${PJ}.`),
+  planned(`[Täiendatakse: projekti eesmärk ja tulemid, ulatus ja piirid, projekti organisatsioon ja juhtkomitee. Vastutaja: ${PJ}.]`),
   H1("2. PROJEKTI PLANEERIMINE"),
   H2("2.1. Projekti ulatus ja tööde struktuur"),
   planned("[Eeldatav sisu: tulemipõhine tööde jaotuse struktuur (WBS), vastutusmaatriks (RACI).]"),
   H2("2.2. Ajakava"),
-  planned("[Eeldatav sisu: etapid ja verstapostid, Gantti diagramm, kriitiline tee.]"),
+  P("Teostusfaas kestab 3 kuud ja on jaotatud etappideks: **1. kuu** – turu-uuring, brändistrateegia ja kontseptsioon, õiguskontroll ja kaubamärgitaotlused; **2. kuu** – pärandvapi ja brändiraamatu kujundus, kaks testimisvooru fännidega, sponsorite ja litsentsiaatidega kokkulepped; **3. kuu** – merchandise’i prototüübid, lansseerimiskampaania, avalik esitlus ja järelmõõtmise algus."),
+  planned("[Täiendatakse: verstapostid, Gantti diagramm, kriitiline tee.]"),
   H2("2.3. Ressursid ja eelarve"),
-  planned("[Eeldatav sisu: ressursiplaan, eelarve ja rahastamisallikad.]"),
+  P(`Eelarve on üles ehitatud etapiviisiliselt, kontseptsioonist ja õiguskaitsest kuni rakenduse ja avaliku lansseerimiseni. Suurim osa vahenditest on suunatud visuaalse identiteedi loomisele ning brändi turule toomisele (tabel 7).`),
+  caption("Tabel", "Projekti esialgne eelarve kulukategooriate kaupa"),
+  table([6171, 1500, 1400],
+    ["Kulukategooria", "Summa", "Osakaal"],
+    [
+      ...budget.map(([k, v]) => [{ t: k }, { t: eur(v), align: AlignmentType.RIGHT }, { t: `${Math.round((v / btotal) * 100)}%`, align: AlignmentType.RIGHT }]),
+      [{ t: "**Kokku**" }, { t: `**${eur(btotal)}**`, align: AlignmentType.RIGHT }, { t: "**100%**", align: AlignmentType.RIGHT }],
+    ]),
+  source(`Allikas: autorite koostatud. Kategooriate jaotus on esialgne ja täpsustatakse planeerimisel. Vastutaja: ${OM}.`),
   H2("2.4. Riskide, kvaliteedi ja kommunikatsiooni juhtimine"),
   planned("[Eeldatav sisu: riskijuhtimise plaan, kvaliteedikriteeriumid, kommunikatsiooniplaan huvipoolte analüüsi põhjal.]"),
   H1("3. PROJEKTI ELLUVIIMINE, SEIRE JA LÕPETAMINE"),
@@ -295,8 +340,8 @@ children.push(
 // KOKKUVÕTE
 children.push(
   H1("KOKKUVÕTE"),
-  P("Rühmatöö alapeatükis 1.2 analüüsiti, miks on Pärnul vaja madalhooaja külastatavuse suurendamise projekti. Probleemipuu näitas, et põhiprobleemi – külastatavuse ja turismitulu järsu languse madalhooajal – peamised põhjused on ilmast sõltumatute atraktsioonide ja sündmuste vähesus, suvele keskenduv turundus ning piiratud ligipääs ja teenuste kättesaadavus talvel. Eesmärgipuu sõnastas soovitud püsiseisundi ja eristas projekti ulatusse kuuluvad alameesmärgid programmi teiste projektide omadest."),
-  P("Huvipoolte analüüs tuvastas 13 huvipoolt, kellest võtmeisikud on linnavalitsus, majutus- ja spaaettevõtted ning sihtkoha turundusorganisatsioon. Peamised vastuolud (suurinvesteering vs eelarvedistsipliin, sündmuste maht vs elukvaliteet, arendus vs looduskaitse) lahendatakse kokkulepete ja mõjukusele vastava kaasamisega. Alternatiivide võrdlus näitas, et efektiivseim on sündmuste programmi ja ühisturunduse ning digitaalse platvormi etapiviisiline kombinatsioon; omaniku esialgne siseranna idee jätkab programmis teostatavusuuringuna."),
+  P("Rühmatöö alapeatükis 1.2 analüüsiti, miks on Juventus FC-l vaja projekti „Juventus uuesti ja paremini“. Probleemipuu näitas, et 2017. aasta rebrändingu järel killustunud fännibaasi peamised põhjused on sideme katkemine klubi ajaloolise sümboolikaga, fännide kaasamata jätmine ja globaalset ärilist sihtrühma eelistav brändistrateegia. Eesmärgipuu sõnastas soovitud püsiseisundi – ühendatud fännibaasi, mis samastub klubi identiteediga – ning eristas 3-kuulise projekti ulatusse kuuluvad alameesmärgid programmi teiste projektide omadest."),
+  P("Huvipoolte analüüs tuvastas 13 huvipoolt, kellest võtmeisikud on omanik, klubi juhatus ja turundusosakond ning sponsorid. Peamine vastuolu – traditsioon versus globaalne bränd – lahendatakse kahetasandilise brändiga ja fännide kaasamisega. Alternatiivide võrdlus näitas, et efektiivseim on pärandvapi taastamine koos fännide kaasamise programmiga (B+D), mis mahub 96 800-eurose eelarve ja 3 kuu sisse ning on kaalude muutmise suhtes stabiilne."),
 );
 
 // KASUTATUD ALLIKAD
@@ -304,77 +349,80 @@ const refs = [
   "Anthropic. (2026). *Claude* [Suur keelemudel]. https://claude.ai",
   "AXELOS. (2017). *Managing successful projects with PRINCE2* (6th ed.). TSO.",
   "Bryson, J. M. (2004). What to do when stakeholders matter: Stakeholder identification and analysis techniques. *Public Management Review, 6*(1), 21–53. https://doi.org/10.1080/14719030410001675722",
-  "Butler, R. W. (2001). Seasonality in tourism: Issues and implications. In T. Baum & S. Lundtorp (Eds.), *Seasonality in tourism* (pp. 5–21). Pergamon.",
+  "Design Week. (2017, jaanuar). *Juventus seeks to go “beyond football” with new brand*. https://www.designweek.co.uk/issues/16-22-january-2017/juventus-seeks/",
+  "Dezeen. (2017, 17. jaanuar). *Juventus FC faces fan uprising after launching minimal new logo*. https://www.dezeen.com/2017/01/17/juventus-football-club-faces-fan-uprising-after-minimalist-new-logo-graphics-design/",
   "Eden, C., & Ackermann, F. (1998). *Making strategy: The journey of strategic management*. Sage.",
-  "ERR. (2023). *Pärnu ettevõtjad tahavad rajada linna siseranna*. https://www.err.ee/1609560280/parnu-ettevotjad-tahavad-rajada-linna-siseranna",
   "European Commission. (2004). *Aid delivery methods. Volume 1: Project cycle management guidelines*. EuropeAid Cooperation Office.",
-  "Getz, D., & Page, S. J. (2016). Progress and prospects for event tourism research. *Tourism Management, 52*, 593–631. https://doi.org/10.1016/j.tourman.2015.03.007",
-  "Hohmann, C. (2018, 13. september). *Goal tree, not for strategy only*. https://hohmannchris.wordpress.com/2018/09/13/goal-tree-not-for-strategy-only/",
+  "Football Italia. (2017, 16. jaanuar). *Juventus present new logo*. https://www.football-italia.net/96994/juventus-present-new-logo",
   "IAP2. (2018). *IAP2 spectrum of public participation*. International Association for Public Participation. https://www.iap2.org",
   "Ishikawa, K. (1990). *Introduction to quality control*. 3A Corporation.",
   "ISO. (2012). *ISO 21500:2012 Guidance on project management*. International Organization for Standardization.",
+  "It’s Nice That. (2017, 17. jaanuar). *Juventus football club given a new identity by Interbrand*. https://www.itsnicethat.com/news/juventus-football-club-interbrand-rebrand-170117",
+  "Keller, K. L. (1993). Conceptualizing, measuring, and managing customer-based brand equity. *Journal of Marketing, 57*(1), 1–22. https://doi.org/10.1177/002224299305700101",
   "Learn Lean Sigma. (s.a.). *Fishbone diagram vs 5 whys analysis*. https://www.learnleansigma.com/root-cause-analysis/fishbone-diagram-vs-5-whys-analysis/",
   "LinkedIn. (s.a.). *How do you compare and contrast problem tree with other problem analysis techniques?* https://www.linkedin.com/advice/0/how-do-you-compare-contrast-problem-tree",
   "Mendelow, A. L. (1981). Environmental scanning: The impact of the stakeholder concept. In *Proceedings of the Second International Conference on Information Systems* (pp. 407–418). ICIS.",
   "Ohno, T. (1988). *Toyota production system: Beyond large-scale production*. Productivity Press.",
-  "Pärnu Linnavalitsus. (2018). *Pärnu linna arengukava 2018–2035*. Pärnu Linnavalitsus.",
-  "Pärnumaa Omavalitsuste Liit. (2019). *Pärnumaa arengustrateegia 2035*. https://parnumaa.ee/wp-content/uploads/2020/04/Arengustrateegia-2035.pdf",
   "PMI. (2021). *A guide to the project management body of knowledge (PMBOK guide)* (7th ed.). Project Management Institute.",
   "PMI. (s.a.). *Stakeholder management strategies: Applying risk management*. https://www.pmi.org/learning/library/stakeholder-management-strategies-applying-risk-management-7479",
-  "SSWM. (s.a.). *Problem tree analysis*. Sustainable Sanitation and Water Management Toolbox. http://www.sswm.info/content/problem-tree-analysis",
   "Stakeholdermap.com. (s.a.). *Stakeholder analysis*. https://www.stakeholdermap.com/stakeholder-analysis.html",
   "Tamberg, T. (2022). *Projektijuhtimise meetodid ja tehnikad. 2. Projektide määratlemine* [Loengumaterjalid, slaidid 1–36]. Tartu Ülikooli Pärnu kolledž.",
   "Tartu Ülikooli Pärnu kolledž. (2025). *Üliõpilastööde juhend*. https://parnu.ut.ee/sites/default/files/2025-09/PC_juhend_2025.pdf",
+  "The Drum. (2017). *Juventus upset fans after rebranding their famous club crest*. https://www.thedrum.com/news/juventus-upset-fans-after-rebranding-their-famous-club-crest",
+  "Wann, D. L., & Branscombe, N. R. (1993). Sports fans: Measuring degree of identification with their team. *International Journal of Sport Psychology, 24*(1), 1–17.",
 ];
 children.push(H1("KASUTATUD ALLIKAD"), ...refs.map((r) => new Paragraph({ style: "Reference", children: runs(r) })));
 
 // LISAD
 const tasks = [
-  ["1", "Töö koordineerimine, sissejuhatus, alapeatükid 1.1 ja 1.2.1 (metoodika, tabel 1), 1.2.6 (joonis 4), kokkuvõte", M.A + " (projektijuht)", M.D, "09.10.2026"],
-  ["2", "Probleemipuu (joonis 1), probleemi lause, 5 korda miks", M.B, M.A, "09.10.2026"],
-  ["3", "Eesmärgipuu ja projekti ulatus (joonis 2), tulemusnäitajad", M.B, M.D, "11.10.2026"],
-  ["4", "Huvipoolte tabel (tabel 2), vastandlike huvide tabel (tabel 3), maatriks (joonis 3), kaasamise strateegia", M.C, M.A, "11.10.2026"],
-  ["5", "Lahendusideed, alternatiivide võrdlus (tabelid 4 ja 5), tundlikkusanalüüs", M.D, M.C, "12.10.2026"],
-  ["6", "Vormistuse tagamine: blankett, stiilid, pealdised, joonte joondus, viited ja allikaloend", M.D, "kõik", "14.10.2026"],
-  ["7", "Tehisaru tagasiside küsimine ja töö täiendamine (lisa 3)", M.A, "kõik", "13.10.2026"],
-  ["8", "Õppetundide analüüs (lisa 2)", "kõik (koond: " + M.C + ")", "–", "14.10.2026"],
-  ["9", "Lõplik ülevaatus ja esitamine", M.A, "kõik", "16.10.2026"],
+  ["1", "Töö koordineerimine, sissejuhatus, 1.1, metoodika 1.2.1 (tabel 1), 1.2.6 (joonis 4), kokkuvõte", `${PJ} (projektijuht)`, AI, "09.10.2026"],
+  ["2", "Probleemipuu (joonis 1), probleemi lause, 5 korda miks", `${EX} (ekspert)`, PJ, "09.10.2026"],
+  ["3", "Eesmärgipuu ja projekti ulatus (joonis 2), tulemusnäitajad", `${OM} (omanik)`, EX, "11.10.2026"],
+  ["4", "Huvipoolte tabel (tabel 2), vastandlikud huvid (tabel 3), maatriks (joonis 3), kaasamise strateegia", PJ, OM, "11.10.2026"],
+  ["5", "Lahendusideed, alternatiivide võrdlus (tabelid 4 ja 5), tundlikkusanalüüs", OM, EX, "12.10.2026"],
+  ["6", "Meeskonna rollid ja eelarve (tabelid 6 ja 7)", OM, PJ, "12.10.2026"],
+  ["7", "Tehisaru päringud, tagasiside ja töö täiendamine (lisa 3)", `${AI} (AI prompter)`, "kõik", "13.10.2026"],
+  ["8", "Vormistuse ja kvaliteedi tagamine: blankett, stiilid, pealdised, joonte joondus, viited", `${AI} (kvaliteedikontroll)`, PJ, "14.10.2026"],
+  ["9", "Õppetundide analüüs (lisa 2)", `kõik (koond: ${AI})`, "–", "14.10.2026"],
+  ["10", "Lõplik ülevaatus ja esitamine", PJ, "kõik", "16.10.2026"],
 ];
 children.push(
   H1("LISAD"),
   H2("Lisa 1. Rühma tööjaotus ja vahetähtajad"),
-  P(`Rühma juht (projektijuht) on ${M.A}, vormistuse eest vastutab ${M.D}. Rühm kohtub vahetähtaegade järel veebis; töö versioonid hoitakse ühises kaustas, kus iga muudatuse tegija on nähtav.`),
+  P(`Rühma juht (projektijuht) on ${PJ}, omaniku rolli täidab ${OM}, valdkonna eksperdina tegutseb ${EX} ning tehisaru päringute ja kvaliteedikontrolli eest (sh vormistus) vastutab ${AI}. Peamine töökanal on Google Workspace, kus hoitakse töö versioone, tabeleid ja tehisaruga peetud vestlusi; toetav kanal kiireks suhtluseks on Facebook Messengeri grupp.`),
   caption("Tabel", "Tööjaotus, vastutajad ja vahetähtajad"),
-  table([500, 3971, 1700, 1300, 1600],
+  table([500, 3771, 1900, 1300, 1600],
     ["Nr", "Ülesanne või objekt", "Vastutaja", "Kaasteostaja", "Vahetähtaeg"],
     tasks.map((r) => r.map((v, i) => ({ t: v, align: [0, 4].includes(i) ? AlignmentType.CENTER : AlignmentType.LEFT })))),
   source("Allikas: autorite koostatud. Kuupäevad on esialgsed ja täpsustatakse vastavalt õppeaine tähtajale."),
 
   H2("Lisa 2. Töö õppetunnid"),
-  P("**Miks on korrektne vormistus selle ülesande juures oluline?** Probleemi- ja eesmärgipuu ning huvipoolte maatriks on suhtlusvahendid: neid kasutatakse omaniku ja huvipooltega kokkulepete tegemisel. Joondatud kastid, ühtne kirjasuurus ja kastide külge kinnitatud ühendajad muudavad põhjus–tagajärg seosed üheselt loetavaks ning võimaldavad joonist projekti käigus kiiresti muuta. Pealdised ja viited tagavad, et tekstist saab objektidele viidata ja et lugeja eristab rühma hinnanguid allikatest pärit faktidest."),
-  P("**Milliseid oskusi arendasime?** Probleemi eristamist riskist, põhjuslike seoste modelleerimist, eesmärkide sõnastamist püsiseisunditena, huvipoolte hindamist ja kaasamise kavandamist, kaalutud otsustusanalüüsi koos tundlikkusanalüüsiga, Wordi jooniste ala ja pealdiste kasutamist ning tehisaru väljundi kriitilist hindamist."),
-  P("**Mis toetas ja mis takistas õppimist?** Toetasid slaidikogu näited (slaid 17, 29 ja 33), rühmaarutelu ja tehisaru kiire tagasiside. Takistasid avalike andmete killustatus (täituvusnäitajad pärinevad eri aastatest), mõnede veebiallikate piiratud kättesaadavus ning see, et huvi- ja mõjuhinnangud on subjektiivsed, kuni neid pole huvipooltega valideeritud."),
-  P("**Kas alternatiivsed ideed täidavad kaardistatud eesmärke erinevalt?** Jah. Tabelist 5 nähtub, et sündmuste programm (A) katab sündmuste ja turunduse haru, siserand (B) aastaringse taristu haru ning platvorm (C) teenuste kättesaadavuse haru. Ükski alternatiiv üksi ei kata kõiki alameesmärke, seetõttu on mõistlik kombineeritud ja etapiviisiline lahendus ning programmi tasandil mitu projekti."),
+  P("**Miks on korrektne vormistus selle ülesande juures oluline?** Rebrändingu projektis on visuaalne ja täpne esitus sisu osa: probleemi- ja eesmärgipuud ning huvipoolte maatriksit kasutatakse omaniku ja huvipooltega kokkulepete tegemisel. Joondatud kastid, ühtne kirjasuurus ja kastide külge kinnitatud ühendajad muudavad põhjus–tagajärg seosed üheselt loetavaks ning võimaldavad joonist kiiresti muuta. Pealdised ja viited tagavad, et tekstis saab objektidele viidata ja lugeja eristab rühma hinnanguid allikatest pärit faktidest."),
+  P("**Milliseid oskusi arendasime?** Probleemi eristamist riskist, põhjuslike seoste modelleerimist, eesmärkide sõnastamist püsiseisunditena (mitte „uus logo“), huvipoolte hindamist ja vastandlike huvide ühitamist, kaalutud otsustusanalüüsi koos tundlikkusanalüüsiga, Wordi jooniste ala ja pealdiste kasutamist ning tehisaru väljundi kriitilist hindamist."),
+  P("**Mis toetas ja mis takistas õppimist?** Toetasid slaidikogu näited (slaid 17, 29 ja 33), rühmaliikmete rollijaotus (omanik, ekspert, projektijuht, kvaliteedikontroll) ning tehisaru kiire tagasiside. Takistasid see, et fännibaasi killustumise kohta puuduvad avalikud kvantitatiivsed andmed (need tuleb koguda turu-uuringuga), ning see, et huvi- ja mõjuhinnangud on subjektiivsed, kuni neid pole huvipooltega valideeritud."),
+  P("**Kas alternatiivsed ideed täidavad kaardistatud eesmärke erinevalt?** Jah. Tabelist 5 nähtub, et vana vapi taastamine (A) ja kahetasandiline bränd (B) katavad sümboolika haru, logo ümberkujundamine koos fännidega (C) ja kommunikatsiooniprogramm (D) kaasamise ja kommunikatsiooni haru. Ükski alternatiiv üksi ei kata kõiki alameesmärke, seetõttu on parim lahendus kombinatsioon B+D."),
   P("**Millist tagasisidet saime tehisarult ja kas täiendasime tööd?** Tehisaru tagasiside ja selle põhjal tehtud muudatused on esitatud lisas 3."),
-  P("**Kuidas tagasime rühmas usalduse ja vastutuse?** Igal objektil on nimeline vastutaja ja kaasteostaja (lisa 1), kes kontrollib vastutaja tööd enne vahetähtaega (nelja silma põhimõte). Otsused (nt tehnika valik ja kriteeriumide kaalud) tehti koosolekul konsensusega ja kaalud fikseeriti enne hindamist. Kõik versioonid ja tehisaruga peetud vestlused on ühises kaustas kõigile nähtavad, mis loob läbipaistvuse ja võimaldab panust hinnata."),
+  P("**Kuidas tagasime rühmas usalduse ja vastutuse?** Usalduse ja vastutuse tagame teadmisega, et meil kõigil on ühine eesmärk – omandada kõrgharidus. Lisaks on igal objektil nimeline vastutaja ja kaasteostaja (lisa 1), kes kontrollib vastutaja tööd enne vahetähtaega. Kõik versioonid ja tehisaruga peetud vestlused on Google Workspace’is kõigile nähtavad ning kiired küsimused lahendatakse Messengeri grupis, mis loob läbipaistvuse ja võimaldab iga liikme panust hinnata."),
 
   H2("Lisa 3. Vestlus tehisaruga ja selle põhjal tehtud täiendused"),
-  P("Tehisaruna kasutati keelemudelit Claude (Anthropic, 2026). Allpool on vestluse sisu lühendatult; täielik vestlus on rühma ühises kaustas kõigile liikmetele nähtav."),
-  P("**Rühma päring (lühendatult):** „Vaadake üle slaidikogu 2 slaidid 1–36 ning muud seonduvad juhendid. Esitage terviklikku peatükkide struktuuri sisaldav DOCX-fail, milles on alapeatükk 1.2: metoodika (sh tehisaru ja teaduslike allikate kasutus), probleemide puu, eesmärkide puu, huvigruppide tabel ja kaasamise strateegia, alternatiivide võrdlus; lisad tööjaotuse ja õppetundidega. Joonistel kasutada jooniste ala ja ühendajaid, joondust ning pealdiseid.“"),
-  P("**Tehisaru vastus ja tagasiside töö versioonile:**"),
-  N("Probleemipuusse ei tohi panna projekti riske (nt „projekt võib hilineda“) – probleem kirjeldab olukorda enne projekti (Tamberg, 2022, slaid 11). *Kontrollitud: probleemipuus on ainult olemasoleva olukorra puudujäägid.*", "num2"),
-  N("Eesmärgid peavad olema sõnastatud püsiseisundina, mitte tegevusena („siserand on ehitatud“ on tulem, mitte eesmärk). *Arvestatud: eesmärgipuus on seisundid, siserand on käsitletud alternatiivina.*", "num2"),
-  N("Alternatiivide võrdluses peavad kaalud olema fikseeritud enne hindamist ning tulemuse stabiilsust tuleb kontrollida. *Täiendatud: lisati tundlikkusanalüüs, mis näitas, et kulu suurema kaalu korral on A ja A+C võrdsed – soovitust täpsustati etapiviisiliseks.*", "num2"),
-  N("Huvipoolte tabelist peab selguma kaasamise strateegia ja vastandlikud huvid. *Arvestatud: tabel 3 ja kaasamise strateegia IAP2 tasemete kaupa.*", "num2"),
-  N("Avalikud statistikanäitajad (täituvus 39–50% vs 60–80%) tuleb kontrollida algallikast (Statistikaamet, arengukava) ja märkida aasta. *Avatud: kontrollib " + M.B + " enne esitamist.*", "num2"),
-  N("Tehisaru ei pääsenud ligi LinkedIni artiklile ega kolledži blanketile – rühm peab artikli ise läbi lugema ja töö blanketti üle tõstma. *Avatud: " + M.A + " ja " + M.D + ".*", "num2"),
-  P("**Rühma hinnang tehisaru kasutamisele:** tehisaru kiirendas struktuuri loomist ja aitas leida nõrku kohti, kuid sisulised hinnangud, kohalik kontekst ja allikate kontroll jäid rühma vastutusele."),
+  P(`Tehisaruna kasutati keelemudelit Claude (Anthropic, 2026); päringud koostas ${AI}. Allpool on vestluse sisu lühendatult; täielik vestlus on rühma Google Workspace’i kaustas kõigile liikmetele nähtav.`),
+  P("**Päring 1 (lühendatult):** „Vaadake üle slaidikogu 2 slaidid 1–36 ning muud seonduvad juhendid. Esitage terviklikku peatükkide struktuuri sisaldav DOCX-fail, milles on alapeatükk 1.2: metoodika, probleemide puu, eesmärkide puu, huvigruppide tabel ja kaasamise strateegia, alternatiivide võrdlus; lisad tööjaotuse ja õppetundidega.“"),
+  P("**Päring 2 (lühendatult):** „Meie projekt on Juventus FC rebrändimine „Juventus uuesti ja paremini“. 2017. aasta rebränding põhjustas fännibaasi killustumise. Meeskond: Herman Ra Truvek (projektijuht), Robi Mustsaar (AI prompter/kvaliteedikontroll), Hugo-Christopher Saar (ekspert), Ragnar Dietrich (omanik). Huvipooled, kaheksa spetsialistirolli, eelarve ca 96 800 € (7 kulukategooriat, ca 9000 € reserv), teostusfaas 3 kuud.“"),
+  P("**Tehisaru tagasiside ja rühma tegevus:**"),
+  N("Probleemipuusse ei tohi panna projekti riske (nt „fännid võivad ka uut lahendust kritiseerida“) – need kuuluvad alapeatükki 1.3. *Arvestatud.*", "num2"),
+  N("„Uus logo“ on projekti tulem, mitte eesmärk; eesmärk on fännide samastumine klubiga. *Arvestatud: eesmärgipuus on seisundid ja mõõdetavad näitajad.*", "num2"),
+  N("96 800 eurot ja 3 kuud on täieliku globaalse rebrändingu jaoks vähe (2017. aasta identiteedi lõi rahvusvaheline agentuur Interbrand). Seetõttu on eelistatud alternatiivid, mis kasutavad olemasolevat „J“-kaubamärki. *Arvestatud: kriteeriumid K3 ja K4.*", "num2"),
+  N(`Eelarve jaotus kategooriate kaupa (tabel 7) on tehisaru pakutud näidisjaotus, mis vastab antud kogusummale ja reservile. *Avatud: kinnitavad ${OM} ja ${PJ}.*`, "num2"),
+  N(`Rühma viidatud lisamaterjali link 2017. aasta rebrändingu kohta ei jõudnud tehisaruni; kasutati Dezeeni, Football Italia, Design Weeki ja It’s Nice That’i artikleid. *Avatud: ${AI} lisab rühma allika viidetesse.*`, "num2"),
+  N(`Torino härg on linna sümbol, mistõttu tuleb selle kasutusõigus pärandvapis kontrollida. *Avatud: ${EX} koos kaubamärgiõiguse spetsialistiga.*`, "num2"),
+  N(`Tehisaru ei pääsenud ligi LinkedIni artiklile ega kolledži blanketile. *Avatud: ${PJ} loeb artikli läbi, ${AI} tõstab töö blanketti.*`, "num2"),
+  P("**Rühma hinnang tehisaru kasutamisele:** tehisaru kiirendas struktuuri loomist ja aitas leida nõrku kohti, kuid sisulised hinnangud, projekti kontekst ja allikate kontroll jäid rühma vastutusele."),
 );
 
 // ---------- dokument ----------
 const doc = new Document({
   creator: "Rühm",
-  title: "Pärnu aastaringse kuurortlinna arendamine",
+  title: "Juventus uuesti ja paremini",
   features: { updateFields: true },
   styles: {
     default: {

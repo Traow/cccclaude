@@ -1,28 +1,29 @@
 // Töö sisu: alternatiivide hindamine ja abiandmed (kasutatakse build_doc.js-is)
 
 const members = {
-  A: "Liige A",
-  B: "Liige B",
-  C: "Liige C",
-  D: "Liige D",
+  PJ: "Herman Ra Truvek",
+  AI: "Robi Mustsaar",
+  EX: "Hugo-Christopher Saar",
+  OM: "Ragnar Dietrich",
 };
 
 // Lahendusalternatiivide hindamiskriteeriumid ja kaalud (summa 100%)
 const criteria = [
-  { id: "K1", name: "Mõju põhieesmärgile (madalhooaja külastatavus ja tulu)", w: 0.25 },
+  { id: "K1", name: "Mõju fännibaasi taasühendamisele", w: 0.25 },
   { id: "K2", name: "Eesmärgipuu alameesmärkide katvus (O1–O3)", w: 0.20 },
-  { id: "K3", name: "Kulu ja rahastatavus", w: 0.15 },
-  { id: "K4", name: "Teostatavus ja aeg esimese tulemuseni", w: 0.15 },
+  { id: "K3", name: "Mahtumine eelarvesse (96 800 €)", w: 0.15 },
+  { id: "K4", name: "Teostatavus 3 kuu jooksul", w: 0.15 },
   { id: "K5", name: "Riskitase (5 = madal risk)", w: 0.10 },
   { id: "K6", name: "Huvipoolte toetus, vastuolude vähesus", w: 0.15 },
 ];
 
 const alternatives = [
-  { id: "A", name: "„Talvine Pärnu“ sündmuste programm ja ühisturundus", scores: [4, 3, 4, 5, 4, 4] },
-  { id: "B", name: "Siseranna ehk aastaringse vee- ja vabaajakeskuse rajamine", scores: [5, 3, 1, 1, 2, 3] },
-  { id: "C", name: "Digitaalne sihtkohaplatvorm „Pärnu Pass“", scores: [3, 3, 4, 3, 3, 4] },
-  { id: "A+C", name: "A ja C etapiviisiline kombinatsioon", scores: [5, 4, 3, 4, 4, 4] },
-  { id: "0", name: "Nullalternatiiv (senine tegevus)", scores: [1, 1, 5, 5, 3, 1] },
+  { id: "A", name: "Ajaloolise ovaalse vapi täielik taastamine", scores: [3, 2, 2, 2, 2, 2] },
+  { id: "B", name: "Kahetasandiline bränd: „J“ + pärandvapp", scores: [4, 4, 4, 4, 4, 4] },
+  { id: "C", name: "„J“ logo ümberkujundamine koos fännidega", scores: [4, 3, 2, 2, 3, 3] },
+  { id: "D", name: "Ainult kogukonna- ja kommunikatsiooniprogramm", scores: [2, 2, 5, 5, 4, 3] },
+  { id: "B+D", name: "Pärandvapp koos fännide kaasamise programmiga", scores: [5, 5, 3, 4, 4, 5] },
+  { id: "0", name: "Nullalternatiiv (senine bränd)", scores: [1, 1, 5, 5, 2, 1] },
 ];
 
 function weighted(scores, weights) {

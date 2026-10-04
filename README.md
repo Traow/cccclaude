@@ -1,6 +1,6 @@
-# PJM ülesanne 2 – alapeatükk 1.2
+# PJM ülesanne 2 – „Juventus uuesti ja paremini“, alapeatükk 1.2
 
-`PJM_T2_alapeatukk_1.2.docx` – rühmatöö (probleemipuu, eesmärgipuu, huvipoolte analüüs, alternatiivide võrdlus, lisad).
+`Juventus_uuesti_ja_paremini_T2_1.2.docx` – rühmatöö (probleemipuu, eesmärgipuu, huvipoolte analüüs, alternatiivide võrdlus, lisad).
 
 Uuesti genereerimine:
 
