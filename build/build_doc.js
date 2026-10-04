@@ -135,7 +135,7 @@ const PJ = M.PJ, AI = M.AI, EX = M.EX, OM = M.OM;
 const tc = (t, o = {}, sp = {}) => new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 0, after: 0, ...sp }, children: [new TextRun({ text: t, ...o })] });
 children.push(
   tc("TARTU ÜLIKOOL"), tc("Pärnu kolledž"),
-  tc(`${PJ}, ${AI}`, {}, { before: 3200 }), tc(`${EX}, ${OM}`), tc("[kursuse lühend]"),
+  tc(`${PJ}, ${AI}`, {}, { before: 3200 }), tc(`${EX}, ${OM}`), tc("DDSÕ2 (bakalaureuseõpe)"),
   tc("„JUVENTUS UUESTI JA PAREMINI“: JUVENTUS FC REBRÄNDIMISE PROJEKT", { bold: true, size: 36 }, { before: 1000, line: 360 }),
   tc("Rühmatöö", {}, { before: 360 }),
   tc("Õppejõud: T. Tamberg, [kraad]", {}, { before: 2000 }),
