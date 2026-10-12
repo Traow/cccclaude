@@ -29,8 +29,8 @@
           <span class="dm-accent">{{ section.settings.title_3 }}</span>
         </h1>
       </div>
-      {%- if section.settings.show_timer and section.settings.timer_end != blank -%}
-        <dm-countdown class="dm-timer" data-end="{{ section.settings.timer_end | escape }}">
+      {%- if section.settings.show_timer -%}
+        <dm-countdown class="dm-timer" data-mode="{{ section.settings.timer_mode }}" data-tz="Europe/Tallinn" data-end="{{ section.settings.timer_end | escape }}">
           <div class="dm-timer__live">
             {%- if section.settings.timer_label != blank -%}
               <p class="dm-timer__label">{{ section.settings.timer_label }}</p>
@@ -58,8 +58,13 @@
           if (!customElements.get('dm-countdown')) {
             customElements.define('dm-countdown', class extends HTMLElement {
               connectedCallback() {
-                this.end = Date.parse(this.dataset.end);
-                if (isNaN(this.end)) { this.hidden = true; return; }
+                this.daily = this.dataset.mode === 'daily';
+                if (this.daily) {
+                  this.clock = new Intl.DateTimeFormat('en-GB', { timeZone: this.dataset.tz, hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' });
+                } else {
+                  this.end = Date.parse(this.dataset.end);
+                  if (isNaN(this.end)) { this.hidden = true; return; }
+                }
                 this.tick();
                 this.timer = setInterval(() => this.tick(), 1000);
                 const btn = this.querySelector('[data-code]');
@@ -77,7 +82,15 @@
               }
               disconnectedCallback() { clearInterval(this.timer); }
               tick() {
-                const left = this.end - Date.now();
+                let left;
+                if (this.daily) {
+                  // Time left until the next midnight in the store's time zone; restarts every day.
+                  const now = {};
+                  for (const part of this.clock.formatToParts(new Date())) now[part.type] = Number(part.value);
+                  left = (86400 - (now.hour * 3600 + now.minute * 60 + now.second)) * 1000;
+                } else {
+                  left = this.end - Date.now();
+                }
                 if (left <= 0) {
                   clearInterval(this.timer);
                   this.querySelector('.dm-timer__live').hidden = true;
@@ -271,7 +284,8 @@
     { "type": "header", "content": "Countdown timer" },
     { "type": "checkbox", "id": "show_timer", "label": "Show countdown timer", "default": true },
     { "type": "text", "id": "timer_label", "label": "Label", "default": "Offer ends in" },
-    { "type": "text", "id": "timer_end", "label": "End date & time", "default": "2026-10-19T23:59:00+03:00", "info": "Format: YYYY-MM-DDTHH:MM:SS+03:00 (Estonian summer time) or +02:00 (winter time)" },
+    { "type": "select", "id": "timer_mode", "label": "Timer type", "default": "daily", "options": [ { "value": "daily", "label": "Daily – restarts every midnight (Estonian time)" }, { "value": "fixed", "label": "Fixed – counts down to the end date below" } ] },
+    { "type": "text", "id": "timer_end", "label": "End date & time (fixed timer only)", "default": "2026-10-19T23:59:00+03:00", "info": "Format: YYYY-MM-DDTHH:MM:SS+03:00 (Estonian summer time) or +02:00 (winter time)" },
     { "type": "text", "id": "timer_offer", "label": "Offer text", "default": "20% off orders over €29.99 with code" },
     { "type": "text", "id": "timer_code", "label": "Discount code", "default": "DRIPM20" },
     { "type": "text", "id": "timer_ended_text", "label": "Text when timer ends", "default": "This offer has ended. Stay tuned for the next drop." },
