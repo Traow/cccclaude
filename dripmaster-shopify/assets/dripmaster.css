@@ -14,10 +14,24 @@
 
 .dm-hero { padding: clamp(48px, 8vw, 112px) var(--dm-pad) clamp(40px, 6vw, 80px); border-bottom: 1px solid var(--dm-line); }
 .dm-hero__row { display: flex; flex-wrap: wrap; gap: 48px; align-items: flex-end; }
-.dm-hero__title-wrap { flex: 999 1 520px; min-width: 0; }
+.dm-hero__title-wrap { flex: 0 1 auto; min-width: 0; }
 .dm-kicker { margin: 0 0 20px; font-size: 13px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--dm-accent); }
 .dm-hero__title { font-size: clamp(64px, 13vw, 200px); line-height: .88; letter-spacing: -.01em; }
-.dm-hero__side { flex: 1 1 320px; display: flex; flex-direction: column; gap: 24px; max-width: 420px; }
+.dm-hero__side { flex: 0 1 360px; display: flex; flex-direction: column; gap: 24px; max-width: 420px; }
+.dm-timer { flex: 1 1 340px; align-self: center; display: flex; flex-direction: column; align-items: center; text-align: center; }
+.dm-timer__live { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+.dm-timer__label { margin: 0; font-size: 13px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--dm-muted); }
+.dm-timer__clock { display: flex; align-items: flex-start; gap: clamp(6px, 1vw, 14px); }
+.dm-timer__unit { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 1.6em; }
+.dm-timer__num { font-size: clamp(48px, 6.5vw, 96px); line-height: 1; font-variant-numeric: tabular-nums; }
+.dm-timer__sep { font-size: clamp(40px, 5vw, 80px); line-height: 1; color: var(--dm-muted); }
+.dm-timer__cap { font-size: 11px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--dm-muted); }
+.dm-timer__code { display: inline-flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 10px; min-height: 48px; padding: 10px 20px; background: transparent; border: 1px dashed var(--dm-fg); color: var(--dm-fg); font-family: inherit; font-size: 14px; letter-spacing: .06em; text-transform: uppercase; cursor: pointer; }
+.dm-timer__code strong { font-size: 18px; letter-spacing: .12em; }
+.dm-timer__code:hover { background: var(--dm-fg); color: var(--dm-bg); }
+.dm-timer__copy { font-size: 11px; font-weight: 700; letter-spacing: .16em; opacity: .7; }
+.dm-timer [hidden] { display: none !important; }
+.dm-timer__ended { margin: 0; font-size: 16px; color: var(--dm-muted); }
 .dm-hero__text { margin: 0; font-size: 18px; color: #BDBAB2; }
 .dm-btns { display: flex; flex-wrap: wrap; gap: 12px; }
 .dm-btn { display: inline-flex; align-items: center; justify-content: center; min-height: 52px; padding: 0 28px; font-family: inherit; font-size: 14px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; text-decoration: none; cursor: pointer; border: 1px solid var(--dm-fg); background: transparent; color: var(--dm-fg); }

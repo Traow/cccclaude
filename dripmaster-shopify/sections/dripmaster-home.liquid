@@ -29,6 +29,72 @@
           <span class="dm-accent">{{ section.settings.title_3 }}</span>
         </h1>
       </div>
+      {%- if section.settings.show_timer and section.settings.timer_end != blank -%}
+        <dm-countdown class="dm-timer" data-end="{{ section.settings.timer_end | escape }}">
+          <div class="dm-timer__live">
+            {%- if section.settings.timer_label != blank -%}
+              <p class="dm-timer__label">{{ section.settings.timer_label }}</p>
+            {%- endif -%}
+            <div class="dm-timer__clock" role="timer">
+              <div class="dm-timer__unit"><span class="dm-display dm-timer__num" data-unit="d">00</span><span class="dm-timer__cap">Days</span></div>
+              <span class="dm-display dm-timer__sep" aria-hidden="true">:</span>
+              <div class="dm-timer__unit"><span class="dm-display dm-timer__num" data-unit="h">00</span><span class="dm-timer__cap">Hrs</span></div>
+              <span class="dm-display dm-timer__sep" aria-hidden="true">:</span>
+              <div class="dm-timer__unit"><span class="dm-display dm-timer__num" data-unit="m">00</span><span class="dm-timer__cap">Min</span></div>
+              <span class="dm-display dm-timer__sep" aria-hidden="true">:</span>
+              <div class="dm-timer__unit"><span class="dm-display dm-timer__num" data-unit="s">00</span><span class="dm-timer__cap">Sec</span></div>
+            </div>
+            {%- if section.settings.timer_code != blank -%}
+              <button type="button" class="dm-timer__code" data-code="{{ section.settings.timer_code | escape }}">
+                {%- if section.settings.timer_offer != blank -%}<span class="dm-timer__offer">{{ section.settings.timer_offer }}</span>{%- endif -%}
+                <strong>{{ section.settings.timer_code }}</strong>
+                <span class="dm-timer__copy">Copy</span>
+              </button>
+            {%- endif -%}
+          </div>
+          <p class="dm-timer__ended" hidden>{{ section.settings.timer_ended_text }}</p>
+        </dm-countdown>
+        <script>
+          if (!customElements.get('dm-countdown')) {
+            customElements.define('dm-countdown', class extends HTMLElement {
+              connectedCallback() {
+                this.end = Date.parse(this.dataset.end);
+                if (isNaN(this.end)) { this.hidden = true; return; }
+                this.tick();
+                this.timer = setInterval(() => this.tick(), 1000);
+                const btn = this.querySelector('[data-code]');
+                if (btn && !btn.dataset.bound) {
+                  btn.dataset.bound = '1';
+                  btn.addEventListener('click', () => {
+                    if (!navigator.clipboard) return;
+                    navigator.clipboard.writeText(btn.dataset.code).then(() => {
+                      const label = btn.querySelector('.dm-timer__copy');
+                      label.textContent = 'Copied!';
+                      setTimeout(() => { label.textContent = 'Copy'; }, 1500);
+                    });
+                  });
+                }
+              }
+              disconnectedCallback() { clearInterval(this.timer); }
+              tick() {
+                const left = this.end - Date.now();
+                if (left <= 0) {
+                  clearInterval(this.timer);
+                  this.querySelector('.dm-timer__live').hidden = true;
+                  this.querySelector('.dm-timer__ended').hidden = false;
+                  return;
+                }
+                const t = Math.floor(left / 1000);
+                const parts = { d: Math.floor(t / 86400), h: Math.floor(t % 86400 / 3600), m: Math.floor(t % 3600 / 60), s: t % 60 };
+                for (const unit in parts) {
+                  const el = this.querySelector('[data-unit="' + unit + '"]');
+                  if (el) el.textContent = String(parts[unit]).padStart(2, '0');
+                }
+              }
+            });
+          }
+        </script>
+      {%- endif -%}
       <div class="dm-hero__side">
         {%- if section.settings.hero_text != blank -%}
           <p class="dm-hero__text">{{ section.settings.hero_text }}</p>
@@ -201,6 +267,14 @@
     { "type": "text", "id": "btn2_label", "label": "Button 2 label", "default": "View collection" },
     { "type": "url", "id": "btn2_link", "label": "Button 2 link" },
     { "type": "image_picker", "id": "hero_image", "label": "Campaign photo" },
+
+    { "type": "header", "content": "Countdown timer" },
+    { "type": "checkbox", "id": "show_timer", "label": "Show countdown timer", "default": true },
+    { "type": "text", "id": "timer_label", "label": "Label", "default": "Offer ends in" },
+    { "type": "text", "id": "timer_end", "label": "End date & time", "default": "2026-10-19T23:59:00+03:00", "info": "Format: YYYY-MM-DDTHH:MM:SS+03:00 (Estonian summer time) or +02:00 (winter time)" },
+    { "type": "text", "id": "timer_offer", "label": "Offer text", "default": "20% off orders over €29.99 with code" },
+    { "type": "text", "id": "timer_code", "label": "Discount code", "default": "DRIPM20" },
+    { "type": "text", "id": "timer_ended_text", "label": "Text when timer ends", "default": "This offer has ended. Stay tuned for the next drop." },
 
     { "type": "header", "content": "Marquee" },
     { "type": "text", "id": "marquee_text", "label": "Text", "default": "No drip, no trip · Limited drops · DripMaster" },
