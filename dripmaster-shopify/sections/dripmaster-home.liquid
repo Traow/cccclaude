@@ -2,6 +2,8 @@
   DripMaster avaleht – must-valge streetwear sektsioon.
   Paigaldus: Online Store → Themes → … → Edit code → Sections → Add a new section
   → nimi "dripmaster-home" → kleebi see fail → Save.
+  NB! Enne seda: Assets → Add a new asset → Create a blank file → "dripmaster" (.css)
+  → kleebi sinna dripmaster.css sisu → Save.
   Siis Customize → Add section → "DripMaster avaleht".
 {%- endcomment -%}
 
@@ -9,86 +11,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
 
-<style>
-  #shopify-section-{{ section.id }} {
-    --dm-bg: {{ section.settings.color_bg }};
-    --dm-fg: {{ section.settings.color_fg }};
-    --dm-accent: {{ section.settings.color_accent }};
-    --dm-accent-text: {{ section.settings.color_accent_text }};
-    --dm-muted: #A8A59D;
-    --dm-line: #262626;
-    --dm-pad: clamp(16px, 4vw, 56px);
-  }
-  .dm { background: var(--dm-bg); color: var(--dm-fg); font-family: 'Space Grotesk', system-ui, sans-serif; font-size: 16px; line-height: 1.5; }
-  .dm *, .dm *::before, .dm *::after { box-sizing: border-box; }
-  .dm a { color: var(--dm-fg); }
-  .dm a:hover { color: var(--dm-muted); }
-  .dm-display { font-family: 'Anton', sans-serif; font-weight: 400; text-transform: uppercase; line-height: 1; margin: 0; }
-  .dm-accent { color: var(--dm-accent); }
+{{ 'dripmaster.css' | asset_url | stylesheet_tag }}
 
-  .dm-bar { background: var(--dm-accent); color: var(--dm-accent-text); text-align: center; padding: 10px 16px; font-size: 13px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
-
-  .dm-hero { padding: clamp(48px, 8vw, 112px) var(--dm-pad) clamp(40px, 6vw, 80px); border-bottom: 1px solid var(--dm-line); }
-  .dm-hero__row { display: flex; flex-wrap: wrap; gap: 48px; align-items: flex-end; }
-  .dm-hero__title-wrap { flex: 999 1 520px; min-width: 0; }
-  .dm-kicker { margin: 0 0 20px; font-size: 13px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--dm-accent); }
-  .dm-hero__title { font-size: clamp(64px, 13vw, 200px); line-height: .88; letter-spacing: -.01em; }
-  .dm-hero__side { flex: 1 1 320px; display: flex; flex-direction: column; gap: 24px; max-width: 420px; }
-  .dm-hero__text { margin: 0; font-size: 18px; color: #BDBAB2; }
-  .dm-btns { display: flex; flex-wrap: wrap; gap: 12px; }
-  .dm-btn { display: inline-flex; align-items: center; justify-content: center; min-height: 52px; padding: 0 28px; font-family: inherit; font-size: 14px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; text-decoration: none; cursor: pointer; border: 1px solid var(--dm-fg); background: transparent; color: var(--dm-fg); }
-  .dm .dm-btn--solid { background: var(--dm-accent); border-color: var(--dm-accent); color: var(--dm-accent-text); }
-  .dm .dm-btn--solid:hover { opacity: .85; color: var(--dm-accent-text); }
-  .dm-btn:hover { opacity: .8; }
-  .dm-hero__media { margin-top: 56px; height: clamp(280px, 40vw, 560px); border: 1px solid #2A2A2A; overflow: hidden; }
-  .dm-hero__media img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .dm-placeholder { width: 100%; height: 100%; background: repeating-linear-gradient(135deg, #161616 0 14px, #121212 14px 28px); display: flex; align-items: center; justify-content: center; color: #8A877F; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; }
-
-  .dm-marquee { background: var(--dm-fg); color: var(--dm-bg); padding: 14px 0; overflow: hidden; white-space: nowrap; font-size: 28px; letter-spacing: .04em; }
-  .dm-marquee__track { display: inline-block; animation: dm-scroll 30s linear infinite; }
-  @keyframes dm-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-  @media (prefers-reduced-motion: reduce) { .dm-marquee__track { animation: none; } }
-
-  .dm-section { padding: clamp(48px, 6vw, 96px) var(--dm-pad); }
-  .dm-section--tight { padding-top: 0; }
-  .dm-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 16px; margin-bottom: 40px; }
-  .dm-h2 { font-size: clamp(40px, 6vw, 72px); }
-  .dm-link { font-size: 14px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-
-  .dm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 24px; }
-  .dm-card { display: flex; flex-direction: column; gap: 14px; }
-  .dm-card__media { position: relative; display: block; aspect-ratio: 4 / 5; background: #161616; border: 1px solid #2A2A2A; overflow: hidden; }
-  .dm-card__media img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s ease; }
-  .dm-card__media:hover img { transform: scale(1.04); }
-  .dm-tag { position: absolute; top: 12px; left: 12px; background: var(--dm-accent); color: var(--dm-accent-text); padding: 4px 10px; font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
-  .dm-card__info { display: flex; justify-content: space-between; gap: 12px; }
-  .dm-card__title { margin: 0; font-size: 16px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
-  .dm-card__title a { text-decoration: none; }
-  .dm-card__sub { margin: 4px 0 0; font-size: 14px; color: var(--dm-muted); }
-  .dm-card__price { margin: 0; font-weight: 700; white-space: nowrap; }
-  .dm-card__price s { color: var(--dm-muted); font-weight: 400; margin-right: 6px; }
-  .dm-card form { margin: 0; }
-  .dm-card .dm-btn { width: 100%; min-height: 48px; }
-  .dm-card .dm-btn[disabled] { opacity: .4; cursor: not-allowed; }
-
-  .dm-cats { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
-  .dm-cat { position: relative; min-height: 360px; display: flex; align-items: flex-end; padding: 28px; border: 1px solid #2A2A2A; text-decoration: none; overflow: hidden; background: repeating-linear-gradient(135deg, #161616 0 14px, #121212 14px 28px); }
-  .dm-cat img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-  .dm-cat::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,.7), rgba(0,0,0,0) 60%); }
-  .dm-cat span { position: relative; z-index: 1; font-size: 48px; }
-
-  .dm-news { margin: 0 var(--dm-pad) clamp(48px, 6vw, 96px); padding: clamp(32px, 5vw, 64px); background: var(--dm-accent); color: var(--dm-accent-text); display: flex; flex-wrap: wrap; gap: 32px; align-items: center; justify-content: space-between; }
-  .dm-news > div, .dm-news form { flex: 1 1 360px; }
-  .dm-news h2 { font-size: clamp(36px, 5vw, 64px); }
-  .dm-news p { margin: 12px 0 0; font-size: 17px; }
-  .dm-news__row { display: flex; flex-wrap: wrap; gap: 12px; }
-  .dm-news input[type="email"] { flex: 1 1 220px; min-height: 52px; padding: 0 16px; border: 2px solid var(--dm-bg); background: #fff; color: #0B0B0B; font-family: inherit; font-size: 16px; }
-  .dm-news button { min-height: 52px; padding: 0 28px; background: var(--dm-bg); color: var(--dm-fg); border: none; font-family: inherit; font-size: 14px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; cursor: pointer; }
-  .dm-news__msg { margin-top: 12px; font-weight: 700; }
-  .dm-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-</style>
-
-<div class="dm">
+<div class="dm" style="--dm-bg: {{ section.settings.color_bg }}; --dm-fg: {{ section.settings.color_fg }}; --dm-accent: {{ section.settings.color_accent }}; --dm-accent-text: {{ section.settings.color_accent_text }};">
   {%- if section.settings.bar_text != blank -%}
     <div class="dm-bar">{{ section.settings.bar_text }}</div>
   {%- endif -%}
