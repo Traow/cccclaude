@@ -142,14 +142,14 @@
 
   {%- comment -%} NEW DROP – products from a collection {%- endcomment -%}
   <section class="dm-section" id="dm-new">
-    <div class="dm-head">
+    <div class="dm-head dm-head--center">
       <h2 class="dm-display dm-h2">{{ section.settings.products_title }}</h2>
       {%- if section.settings.collection != blank -%}
-        <a class="dm-link" href="{{ section.settings.collection.url }}">View all →</a>
+        <a class="dm-link-inline" href="{{ section.settings.collection.url }}">View all</a>
       {%- endif -%}
     </div>
 
-    <div class="dm-grid">
+    <div class="dm-grid" style="--dm-fit: {{ section.settings.image_fit }};">
       {%- if section.settings.collection != blank and section.settings.collection.products_count > 0 -%}
         {%- for product in section.settings.collection.products limit: section.settings.products_count -%}
           {%- assign variant = product.selected_or_first_available_variant -%}
@@ -180,11 +180,12 @@
                 {%- endif -%}
               </div>
               <p class="dm-card__price">
-                {%- if product.compare_at_price > product.price -%}<s>{{ product.compare_at_price | money }}</s>{%- endif -%}
-                {{ product.price | money }}
+                {{- product.price | money -}}
+                {%- if product.compare_at_price > product.price %} <s>{{ product.compare_at_price | money }}</s>{%- endif -%}
               </p>
             </div>
-            {%- if product.has_only_default_variant -%}
+            {%- if section.settings.show_cart_button == false -%}
+            {%- elsif product.has_only_default_variant -%}
               {%- form 'product', product -%}
                 <input type="hidden" name="id" value="{{ variant.id }}">
                 <button type="submit" class="dm-btn" {% unless variant.available %}disabled{% endunless %}>
@@ -294,10 +295,12 @@
     { "type": "text", "id": "marquee_text", "label": "Text", "default": "No drip, no trip · Limited drops · DripMaster" },
 
     { "type": "header", "content": "Products" },
-    { "type": "text", "id": "products_title", "label": "Heading", "default": "New drop" },
+    { "type": "text", "id": "products_title", "label": "Heading", "default": "This Month's Best Sellers" },
     { "type": "collection", "id": "collection", "label": "Collection" },
-    { "type": "range", "id": "products_count", "label": "Number of products", "min": 2, "max": 12, "step": 1, "default": 4 },
+    { "type": "range", "id": "products_count", "label": "Number of products", "min": 2, "max": 12, "step": 1, "default": 6 },
     { "type": "checkbox", "id": "show_vendor", "label": "Show vendor", "default": false },
+    { "type": "checkbox", "id": "show_cart_button", "label": "Show add to cart button", "default": false },
+    { "type": "select", "id": "image_fit", "label": "Product image fit", "default": "contain", "options": [ { "value": "contain", "label": "Fit – show the whole product" }, { "value": "cover", "label": "Fill – crop to fill the box" } ] },
     { "type": "paragraph", "content": "Badges: add the tag 'new' or 'limited' to a product to show a badge on its card." },
 
     { "type": "header", "content": "Categories" },
