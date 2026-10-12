@@ -75,3 +75,16 @@ footer {
   background: #F2F0EA;
   color: #0B0B0B;
 }
+
+/* Same-size product images everywhere (4:5 portrait, cropped to fill) */
+.card-gallery {
+  --gallery-aspect-ratio: 4 / 5 !important;
+}
+.card-gallery .product-media-container {
+  aspect-ratio: 4 / 5;
+}
+.card-gallery img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
