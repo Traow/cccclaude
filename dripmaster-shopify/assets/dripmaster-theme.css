@@ -1,0 +1,77 @@
+/* DripMaster – global theme overrides for Horizon.
+   Loaded from snippets/fonts.liquid; html:root outranks the theme's later :root variables. */
+html:root {
+  --font-body--family: 'Space Grotesk', system-ui, sans-serif;
+  --font-body--style: normal;
+  --font-subheading--family: 'Space Grotesk', system-ui, sans-serif;
+  --font-subheading--style: normal;
+  --font-subheading--weight: 700;
+  --font-heading--family: 'Anton', Impact, sans-serif;
+  --font-heading--style: normal;
+  --font-heading--weight: 400;
+  --font-accent--family: 'Anton', Impact, sans-serif;
+  --font-accent--style: normal;
+  --font-accent--weight: 400;
+
+  --font-h1--letter-spacing: 0;
+  --font-h2--letter-spacing: 0;
+  --font-h3--letter-spacing: 0.01em;
+  --font-h4--case: uppercase;
+  --font-h5--case: uppercase;
+  --font-h6--case: uppercase;
+
+  --button-text-case-primary: uppercase;
+  --button-text-case-secondary: uppercase;
+}
+
+body {
+  font-family: var(--font-body--family);
+}
+
+/* Buttons: bold, tracked, square */
+.button,
+.button-secondary,
+button.button,
+.shopify-payment-button__button {
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Small UI labels pick up the streetwear tracking */
+h5, h6, .h5, .h6,
+.badge,
+.product-badges__badge {
+  letter-spacing: 0.12em;
+}
+
+/* Header & menu links */
+header-component a,
+.menu-list__link,
+.header__menu a {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 500;
+}
+
+/* Hairline dividers on the dark ground */
+.header,
+#header-group {
+  border-bottom: 1px solid #262626;
+}
+footer {
+  border-top: 1px solid #262626;
+}
+
+/* Product images sit on a dark tile instead of white */
+.product-card__image,
+.product-media,
+.card-gallery {
+  background-color: #161616;
+}
+
+::selection {
+  background: #F2F0EA;
+  color: #0B0B0B;
+}
