@@ -1,10 +1,8 @@
 {%- comment -%}
-  DripMaster avaleht – must-valge streetwear sektsioon.
-  Paigaldus: Online Store → Themes → … → Edit code → Sections → Add a new section
-  → nimi "dripmaster-home" → kleebi see fail → Save.
-  NB! Enne seda: Assets → Add a new asset → Create a blank file → "dripmaster" (.css)
-  → kleebi sinna dripmaster.css sisu → Save.
-  Siis Customize → Add section → "DripMaster avaleht".
+  DripMaster homepage – black & white streetwear section.
+  Install: first add assets/dripmaster.css (Edit code → Assets → Add a new asset),
+  then Edit code → Sections → Add a new section → "dripmaster-home" → paste this file → Save.
+  Then Customize → Add section → "DripMaster homepage".
 {%- endcomment -%}
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -49,12 +47,12 @@
       {%- if section.settings.hero_image != blank -%}
         {{ section.settings.hero_image | image_url: width: 2400 | image_tag: loading: 'eager', sizes: '100vw', widths: '800, 1200, 1600, 2400', alt: section.settings.hero_image.alt }}
       {%- else -%}
-        <div class="dm-placeholder">Lisa kampaaniafoto</div>
+        <div class="dm-placeholder">Add a campaign photo</div>
       {%- endif -%}
     </div>
   </section>
 
-  {%- comment -%} JOOKSEV TEKST {%- endcomment -%}
+  {%- comment -%} MARQUEE {%- endcomment -%}
   {%- if section.settings.marquee_text != blank -%}
     <div class="dm-marquee dm-display" aria-hidden="true">
       <div class="dm-marquee__track">
@@ -63,12 +61,12 @@
     </div>
   {%- endif -%}
 
-  {%- comment -%} UUS DROP – tooted kollektsioonist {%- endcomment -%}
+  {%- comment -%} NEW DROP – products from a collection {%- endcomment -%}
   <section class="dm-section" id="dm-new">
     <div class="dm-head">
       <h2 class="dm-display dm-h2">{{ section.settings.products_title }}</h2>
       {%- if section.settings.collection != blank -%}
-        <a class="dm-link" href="{{ section.settings.collection.url }}">Vaata kõiki →</a>
+        <a class="dm-link" href="{{ section.settings.collection.url }}">View all →</a>
       {%- endif -%}
     </div>
 
@@ -83,14 +81,14 @@
               {%- if product.featured_image -%}
                 {{ product.featured_image | image_url: width: 800 | image_tag: loading: 'lazy', sizes: '(min-width: 1000px) 25vw, 50vw', widths: '400, 600, 800', alt: img_alt }}
               {%- else -%}
-                <div class="dm-placeholder">Tootefoto</div>
+                <div class="dm-placeholder">Product photo</div>
               {%- endif -%}
               {%- if product.available == false -%}
-                <span class="dm-tag">Välja müüdud</span>
+                <span class="dm-tag">Sold out</span>
               {%- elsif tags_down contains 'limited' -%}
                 <span class="dm-tag">Limited</span>
-              {%- elsif tags_down contains 'uus' -%}
-                <span class="dm-tag">Uus</span>
+              {%- elsif tags_down contains 'new' or tags_down contains 'uus' -%}
+                <span class="dm-tag">New</span>
               {%- elsif product.compare_at_price > product.price -%}
                 <span class="dm-tag">Sale</span>
               {%- endif -%}
@@ -111,21 +109,21 @@
               {%- form 'product', product -%}
                 <input type="hidden" name="id" value="{{ variant.id }}">
                 <button type="submit" class="dm-btn" {% unless variant.available %}disabled{% endunless %}>
-                  {%- if variant.available -%}Lisa korvi{%- else -%}Välja müüdud{%- endif -%}
+                  {%- if variant.available -%}Add to cart{%- else -%}Sold out{%- endif -%}
                 </button>
               {%- endform -%}
             {%- else -%}
-              <a class="dm-btn" href="{{ product.url }}">Vali suurus</a>
+              <a class="dm-btn" href="{{ product.url }}">Choose size</a>
             {%- endif -%}
           </article>
         {%- endfor -%}
       {%- else -%}
         {%- for i in (1..4) -%}
           <article class="dm-card">
-            <div class="dm-card__media"><div class="dm-placeholder">Vali kollektsioon</div></div>
+            <div class="dm-card__media"><div class="dm-placeholder">Select a collection</div></div>
             <div class="dm-card__info">
-              <div><h3 class="dm-card__title">Toote nimi</h3></div>
-              <p class="dm-card__price">0,00 €</p>
+              <div><h3 class="dm-card__title">Product name</h3></div>
+              <p class="dm-card__price">€0.00</p>
             </div>
           </article>
         {%- endfor -%}
@@ -133,7 +131,7 @@
     </div>
   </section>
 
-  {%- comment -%} KATEGOORIAD – plokid {%- endcomment -%}
+  {%- comment -%} CATEGORIES – blocks {%- endcomment -%}
   {%- if section.blocks.size > 0 -%}
     <section class="dm-section dm-section--tight">
       <h2 class="dm-display dm-h2" style="margin-bottom: 40px;">{{ section.settings.categories_title }}</h2>
@@ -153,7 +151,7 @@
     </section>
   {%- endif -%}
 
-  {%- comment -%} UUDISKIRI {%- endcomment -%}
+  {%- comment -%} NEWSLETTER {%- endcomment -%}
   {%- if section.settings.show_newsletter -%}
     <section class="dm-news">
       <div>
@@ -163,12 +161,12 @@
       {%- form 'customer', id: 'dm-newsletter' -%}
         <input type="hidden" name="contact[tags]" value="newsletter">
         <div class="dm-news__row">
-          <label for="dm-email-{{ section.id }}" class="dm-sr">E-posti aadress</label>
-          <input id="dm-email-{{ section.id }}" type="email" name="contact[email]" placeholder="sinu@email.ee" autocomplete="email" required>
-          <button type="submit">Liitu</button>
+          <label for="dm-email-{{ section.id }}" class="dm-sr">Email address</label>
+          <input id="dm-email-{{ section.id }}" type="email" name="contact[email]" placeholder="you@email.com" autocomplete="email" required>
+          <button type="submit">Join</button>
         </div>
         {%- if form.posted_successfully? -%}
-          <p class="dm-news__msg">Aitäh! Oled listis.</p>
+          <p class="dm-news__msg">Thanks! You're on the list.</p>
         {%- elsif form.errors -%}
           <p class="dm-news__msg">{{ form.errors | default_errors }}</p>
         {%- endif -%}
@@ -179,69 +177,69 @@
 
 {% schema %}
 {
-  "name": "DripMaster avaleht",
+  "name": "DripMaster homepage",
   "tag": "section",
   "class": "dm-section-wrapper",
   "settings": [
-    { "type": "header", "content": "Värvid" },
-    { "type": "color", "id": "color_bg", "label": "Taust", "default": "#0B0B0B" },
-    { "type": "color", "id": "color_fg", "label": "Tekst", "default": "#F2F0EA" },
-    { "type": "color", "id": "color_accent", "label": "Aktsent (nupud, sildid)", "default": "#F2F0EA" },
-    { "type": "color", "id": "color_accent_text", "label": "Tekst aktsendi peal", "default": "#0B0B0B" },
+    { "type": "header", "content": "Colors" },
+    { "type": "color", "id": "color_bg", "label": "Background", "default": "#0B0B0B" },
+    { "type": "color", "id": "color_fg", "label": "Text", "default": "#F2F0EA" },
+    { "type": "color", "id": "color_accent", "label": "Accent (buttons, badges)", "default": "#F2F0EA" },
+    { "type": "color", "id": "color_accent_text", "label": "Text on accent", "default": "#0B0B0B" },
 
-    { "type": "header", "content": "Ülemine riba" },
-    { "type": "text", "id": "bar_text", "label": "Riba tekst", "default": "Tasuta tarne alates 50 € · Uus drop on väljas" },
+    { "type": "header", "content": "Announcement bar" },
+    { "type": "text", "id": "bar_text", "label": "Bar text", "default": "Free shipping over €50 · New drop out now" },
 
     { "type": "header", "content": "Hero" },
-    { "type": "text", "id": "kicker", "label": "Väike tekst pealkirja kohal", "default": "Drop 01" },
-    { "type": "text", "id": "title_1", "label": "Pealkiri, rida 1", "default": "Kanna" },
-    { "type": "text", "id": "title_2", "label": "Pealkiri, rida 2", "default": "oma" },
-    { "type": "text", "id": "title_3", "label": "Pealkiri, rida 3 (aktsentvärv)", "default": "drippi." },
-    { "type": "textarea", "id": "hero_text", "label": "Kirjeldus", "default": "Streetwear neile, kes ei oota trende, vaid teevad neid. Piiratud kogused, ei mingeid kordustrükke." },
-    { "type": "text", "id": "btn1_label", "label": "Nupp 1 tekst", "default": "Osta kohe" },
-    { "type": "url", "id": "btn1_link", "label": "Nupp 1 link" },
-    { "type": "text", "id": "btn2_label", "label": "Nupp 2 tekst", "default": "Vaata kollektsiooni" },
-    { "type": "url", "id": "btn2_link", "label": "Nupp 2 link" },
-    { "type": "image_picker", "id": "hero_image", "label": "Kampaaniafoto" },
+    { "type": "text", "id": "kicker", "label": "Small text above heading", "default": "Drop 01" },
+    { "type": "text", "id": "title_1", "label": "Heading, line 1", "default": "Wear" },
+    { "type": "text", "id": "title_2", "label": "Heading, line 2", "default": "your" },
+    { "type": "text", "id": "title_3", "label": "Heading, line 3 (accent color)", "default": "drip." },
+    { "type": "textarea", "id": "hero_text", "label": "Description", "default": "Streetwear for those who don't follow trends, they set them. Limited quantities, no restocks." },
+    { "type": "text", "id": "btn1_label", "label": "Button 1 label", "default": "Shop now" },
+    { "type": "url", "id": "btn1_link", "label": "Button 1 link" },
+    { "type": "text", "id": "btn2_label", "label": "Button 2 label", "default": "View collection" },
+    { "type": "url", "id": "btn2_link", "label": "Button 2 link" },
+    { "type": "image_picker", "id": "hero_image", "label": "Campaign photo" },
 
-    { "type": "header", "content": "Jooksev tekst" },
-    { "type": "text", "id": "marquee_text", "label": "Tekst", "default": "No drip, no trip · Limited drops · DripMaster" },
+    { "type": "header", "content": "Marquee" },
+    { "type": "text", "id": "marquee_text", "label": "Text", "default": "No drip, no trip · Limited drops · DripMaster" },
 
-    { "type": "header", "content": "Tooted" },
-    { "type": "text", "id": "products_title", "label": "Pealkiri", "default": "Uus drop" },
-    { "type": "collection", "id": "collection", "label": "Kollektsioon" },
-    { "type": "range", "id": "products_count", "label": "Toodete arv", "min": 2, "max": 12, "step": 1, "default": 4 },
-    { "type": "checkbox", "id": "show_vendor", "label": "Näita brändi nime", "default": false },
-    { "type": "paragraph", "content": "Sildid: lisa tootele tag 'uus' või 'limited', et kaardil silt kuvada." },
+    { "type": "header", "content": "Products" },
+    { "type": "text", "id": "products_title", "label": "Heading", "default": "New drop" },
+    { "type": "collection", "id": "collection", "label": "Collection" },
+    { "type": "range", "id": "products_count", "label": "Number of products", "min": 2, "max": 12, "step": 1, "default": 4 },
+    { "type": "checkbox", "id": "show_vendor", "label": "Show vendor", "default": false },
+    { "type": "paragraph", "content": "Badges: add the tag 'new' or 'limited' to a product to show a badge on its card." },
 
-    { "type": "header", "content": "Kategooriad" },
-    { "type": "text", "id": "categories_title", "label": "Pealkiri", "default": "Kategooriad" },
+    { "type": "header", "content": "Categories" },
+    { "type": "text", "id": "categories_title", "label": "Heading", "default": "Categories" },
 
-    { "type": "header", "content": "Uudiskiri" },
-    { "type": "checkbox", "id": "show_newsletter", "label": "Näita uudiskirja plokki", "default": true },
-    { "type": "text", "id": "news_title", "label": "Pealkiri", "default": "Ära maga dropi maha" },
-    { "type": "text", "id": "news_text", "label": "Tekst", "default": "Liitu listiga ja saa uutest dropidest teada enne teisi." }
+    { "type": "header", "content": "Newsletter" },
+    { "type": "checkbox", "id": "show_newsletter", "label": "Show newsletter block", "default": true },
+    { "type": "text", "id": "news_title", "label": "Heading", "default": "Don't sleep on the drop" },
+    { "type": "text", "id": "news_text", "label": "Text", "default": "Join the list and hear about new drops before anyone else." }
   ],
   "blocks": [
     {
       "type": "category",
-      "name": "Kategooria",
+      "name": "Category",
       "limit": 6,
       "settings": [
-        { "type": "collection", "id": "collection", "label": "Kollektsioon" },
-        { "type": "text", "id": "title", "label": "Nimi (tühjaks jättes kollektsiooni nimi)" },
-        { "type": "image_picker", "id": "image", "label": "Pilt (tühjaks jättes kollektsiooni pilt)" },
-        { "type": "url", "id": "link", "label": "Link (tühjaks jättes kollektsiooni link)" }
+        { "type": "collection", "id": "collection", "label": "Collection" },
+        { "type": "text", "id": "title", "label": "Name (blank = collection name)" },
+        { "type": "image_picker", "id": "image", "label": "Image (blank = collection image)" },
+        { "type": "url", "id": "link", "label": "Link (blank = collection link)" }
       ]
     }
   ],
   "presets": [
     {
-      "name": "DripMaster avaleht",
+      "name": "DripMaster homepage",
       "blocks": [
-        { "type": "category", "settings": { "title": "Hoodied" } },
-        { "type": "category", "settings": { "title": "T-särgid" } },
-        { "type": "category", "settings": { "title": "Aksessuaarid" } }
+        { "type": "category", "settings": { "title": "Hoodies" } },
+        { "type": "category", "settings": { "title": "T-shirts" } },
+        { "type": "category", "settings": { "title": "Accessories" } }
       ]
     }
   ]
