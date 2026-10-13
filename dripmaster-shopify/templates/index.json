@@ -1,0 +1,87 @@
+{
+  "sections": {
+    "dripmaster": {
+      "type": "dripmaster-home",
+      "blocks": {
+        "cat_fragrances": {
+          "type": "category",
+          "settings": {
+            "collection": "fragrances",
+            "title": "Fragrances",
+            "link": ""
+          }
+        },
+        "cat_clothing": {
+          "type": "category",
+          "settings": {
+            "collection": "clothing",
+            "title": "Clothing",
+            "link": ""
+          }
+        },
+        "cat_footwear": {
+          "type": "category",
+          "settings": {
+            "collection": "footwear",
+            "title": "Footwear",
+            "link": ""
+          }
+        },
+        "cat_accessories": {
+          "type": "category",
+          "settings": {
+            "collection": "accessories",
+            "title": "Accessories",
+            "link": ""
+          }
+        },
+        "cat_electronics": {
+          "type": "category",
+          "settings": {
+            "collection": "electronics",
+            "title": "Electronics",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "cat_fragrances",
+        "cat_clothing",
+        "cat_footwear",
+        "cat_accessories",
+        "cat_electronics"
+      ],
+      "settings": {
+        "color_bg": "#0b0b0b",
+        "color_fg": "#f2f0ea",
+        "color_accent": "#f2f0ea",
+        "color_accent_text": "#0b0b0b",
+        "bar_text": "SPEND €29.99 AND SAVE 20% WITH CODE \"DRIPM20\" 🔥",
+        "kicker": "Drop 01",
+        "title_1": "Wear",
+        "title_2": "your",
+        "title_3": "drip.",
+        "hero_text": "Streetwear for those who don't follow trends, they set them. Limited quantities, no restocks.",
+        "btn1_label": "Shop now",
+        "btn1_link": "",
+        "btn2_label": "View collection",
+        "btn2_link": "",
+        "hero_image": "shopify://shop_images/bnnerbanner.jpg",
+        "marquee_text": "No drip, no trip · Limited drops · DripMaster",
+        "products_title": "This Month's Best Sellers",
+        "collection": "all",
+        "products_count": 6,
+        "show_vendor": false,
+        "show_cart_button": false,
+        "image_fit": "contain",
+        "categories_title": "Shop by category",
+        "show_newsletter": true,
+        "news_title": "Don't sleep on the drop",
+        "news_text": "Join the list and hear about new drops before anyone else."
+      }
+    }
+  },
+  "order": [
+    "dripmaster"
+  ]
+}
