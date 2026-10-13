@@ -55,11 +55,7 @@ header-component a,
   font-weight: 500;
 }
 
-/* Hairline dividers on the dark ground */
-.header,
-#header-group {
-  border-bottom: 1px solid #262626;
-}
+/* Hairline divider above the footer (the header's divider comes from its own border setting) */
 footer {
   border-top: 1px solid #262626;
 }
