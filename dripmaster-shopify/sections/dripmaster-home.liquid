@@ -11,6 +11,20 @@
 
 {{ 'dripmaster.css' | asset_url | stylesheet_tag }}
 
+{%- capture category_tiles -%}
+        {%- for block in section.blocks -%}
+          {%- assign cat_url = block.settings.link | default: block.settings.collection.url | default: '#' -%}
+          <a class="dm-cat" href="{{ cat_url }}" {{ block.shopify_attributes }}>
+            {%- if block.settings.image != blank -%}
+              {{ block.settings.image | image_url: width: 1200 | image_tag: loading: 'lazy', sizes: '(min-width: 1000px) 33vw, 100vw', alt: '' }}
+            {%- elsif block.settings.collection.featured_image -%}
+              {{ block.settings.collection.featured_image | image_url: width: 1200 | image_tag: loading: 'lazy', sizes: '(min-width: 1000px) 33vw, 100vw', alt: '' }}
+            {%- endif -%}
+            <span class="dm-display">{{ block.settings.title | default: block.settings.collection.title }}</span>
+          </a>
+        {%- endfor -%}
+{%- endcapture -%}
+
 <div class="dm" style="--dm-bg: {{ section.settings.color_bg }}; --dm-fg: {{ section.settings.color_fg }}; --dm-accent: {{ section.settings.color_accent }}; --dm-accent-text: {{ section.settings.color_accent_text }};">
   {%- if section.settings.bar_text != blank -%}
     <div class="dm-bar">{{ section.settings.bar_text }}</div>
@@ -122,6 +136,11 @@
         </div>
       </div>
     </div>
+    {%- if section.settings.hero_bottom == 'categories' and section.blocks.size > 0 -%}
+      <div class="dm-cats dm-hero__cats">
+        {{ category_tiles }}
+      </div>
+    {%- else -%}
     <div class="dm-hero__media">
       {%- if section.settings.hero_image != blank -%}
         {{ section.settings.hero_image | image_url: width: 2400 | image_tag: loading: 'eager', sizes: '100vw', widths: '800, 1200, 1600, 2400', alt: section.settings.hero_image.alt }}
@@ -129,6 +148,7 @@
         <div class="dm-placeholder">Add a campaign photo</div>
       {%- endif -%}
     </div>
+    {%- endif -%}
   </section>
 
   {%- comment -%} MARQUEE {%- endcomment -%}
@@ -211,22 +231,12 @@
     </div>
   </section>
 
-  {%- comment -%} CATEGORIES – blocks {%- endcomment -%}
-  {%- if section.blocks.size > 0 -%}
+  {%- comment -%} CATEGORIES – shown here only when the hero uses the campaign photo {%- endcomment -%}
+  {%- if section.settings.hero_bottom == 'image' and section.blocks.size > 0 -%}
     <section class="dm-section dm-section--tight">
       <h2 class="dm-display dm-h2" style="margin-bottom: 40px;">{{ section.settings.categories_title }}</h2>
       <div class="dm-cats">
-        {%- for block in section.blocks -%}
-          {%- assign cat_url = block.settings.link | default: block.settings.collection.url | default: '#' -%}
-          <a class="dm-cat" href="{{ cat_url }}" {{ block.shopify_attributes }}>
-            {%- if block.settings.image != blank -%}
-              {{ block.settings.image | image_url: width: 1200 | image_tag: loading: 'lazy', sizes: '(min-width: 1000px) 33vw, 100vw', alt: '' }}
-            {%- elsif block.settings.collection.featured_image -%}
-              {{ block.settings.collection.featured_image | image_url: width: 1200 | image_tag: loading: 'lazy', sizes: '(min-width: 1000px) 33vw, 100vw', alt: '' }}
-            {%- endif -%}
-            <span class="dm-display">{{ block.settings.title | default: block.settings.collection.title }}</span>
-          </a>
-        {%- endfor -%}
+        {{ category_tiles }}
       </div>
     </section>
   {%- endif -%}
@@ -280,6 +290,7 @@
     { "type": "url", "id": "btn1_link", "label": "Button 1 link" },
     { "type": "text", "id": "btn2_label", "label": "Button 2 label", "default": "View collection" },
     { "type": "url", "id": "btn2_link", "label": "Button 2 link" },
+    { "type": "select", "id": "hero_bottom", "label": "Below the heading", "default": "categories", "options": [ { "value": "categories", "label": "Category tiles" }, { "value": "image", "label": "Campaign photo" } ] },
     { "type": "image_picker", "id": "hero_image", "label": "Campaign photo" },
 
     { "type": "header", "content": "Countdown timer" },

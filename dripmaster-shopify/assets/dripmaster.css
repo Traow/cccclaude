@@ -72,6 +72,7 @@
 .dm-card .dm-btn { width: 100%; min-height: 48px; }
 .dm-card .dm-btn[disabled] { opacity: .4; cursor: not-allowed; }
 
+.dm-hero__cats { margin-top: 56px; }
 .dm-cats { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(200px, 44vw), 1fr)); gap: clamp(12px, 2vw, 24px); }
 .dm-cat { position: relative; aspect-ratio: 3 / 4; display: flex; align-items: flex-end; padding: 28px; border: 1px solid #2A2A2A; text-decoration: none; overflow: hidden; background: repeating-linear-gradient(135deg, #161616 0 14px, #121212 14px 28px); }
 .dm-cat img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
